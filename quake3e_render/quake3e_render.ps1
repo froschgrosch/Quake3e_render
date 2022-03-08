@@ -1,5 +1,5 @@
 # Powershell application to aid in demo rendering.
-# github/froschgrosch/quake3-powershell-stuff
+# https://github.com/froschgrosch/quake3-scripts
 
 # Add-Type -AssemblyName System.Windows.Forms
 
