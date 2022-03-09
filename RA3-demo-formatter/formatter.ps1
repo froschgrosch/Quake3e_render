@@ -23,7 +23,7 @@ while ($reiterateFolder) {
             #echo "Processing $f..."
             
             $json = $null
-            $json = .\tools\UDT_json.exe -c "$demoFolder\$f" | ConvertFrom-Json
+            $json = .\zz_tools\UDT_json.exe -c "$demoFolder\$f" | ConvertFrom-Json
             
             if (!$json)
             { 
@@ -39,7 +39,7 @@ while ($reiterateFolder) {
                     echo "Splitting $f..." ''
                 }
                 
-                .\tools\UDT_splitter.exe "$demoFolder\$f" -q
+                .\zz_tools\UDT_splitter.exe "$demoFolder\$f" -q
 
 
                 Remove-Item -Path "$demoFolder\$f"
