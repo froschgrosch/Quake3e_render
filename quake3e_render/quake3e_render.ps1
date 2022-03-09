@@ -52,7 +52,7 @@ if ($mergeRender){
         }
     }
 
-    $demoData = .\zz_render\tools\UDT_json.exe -c "..\..\render_input\$demoName.dm_68" | ConvertFrom-Json
+    $demoData = .\zz_tools\UDT_json.exe -c "..\render_input\$demoName.dm_68" | ConvertFrom-Json
     $game = $demoData.gameStates[0].configStringValues.fs_game
 
     if (-not  $file.Extension -eq ".dm_68" -or -not $config.application.validGames.Contains($game)){

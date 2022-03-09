@@ -4,10 +4,34 @@ A Powershell application to aid in demo rendering. Run with *Right-click\Run wit
 
 ## Installation.
 
-Put the script file and a recent version of [ffmpeg](http://ffmpeg.org/download.html) and [quake3e](https://github.com/ec-/Quake3e/releases/tag/latest) in your quake3 folder. Create the directories *render_input*, *render_output* and *zz_render*. Inside the *zz_render* folder, create a folder *merge_rendetemp* and a folder *tools*. Download [myt's UberDemoTools](https://github.com/mightycow/uberdemotools) for command line, and put UDT_json.exe in the *zz_render/tools* folder you just created. 
+### Downloads
 
-Now it is time to configure the application. To do that, you edit *config.json.txt* in *zz_render*.
+    - [ffmpeg](http://ffmpeg.org/download.html)
+        - ffmpeg.exe and ffprobe.exe
+    - [UDT]
+        - UDT_json.exe
 
+### File structure
+
+```
+Your Q3 folder
+|---baseq3/
+|   ... other mod folders
+|
+|---render_input/
+|---render_output/
+|---zz_render/
+|   |---merge_rendertemp/
+|---zz_tools/
+|   |---UDT_json.exe
+|
+|---ffmpeg.exe
+|---ffprobe.exe
+|---quake3e.x64.exe
+|---quake3e_render.ps1
+
+```
+    
 ## User configurable params
 
 ```
