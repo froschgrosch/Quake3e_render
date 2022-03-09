@@ -2,7 +2,7 @@
 
 A Powershell application to aid in demo rendering. Run with *Right-click\Run with powershell* as some paths in the script are relative. At the moment, only demos in the **.dm_68** format are supported.
 
-## Installation.
+## Installation
 
 ### Downloads
 
