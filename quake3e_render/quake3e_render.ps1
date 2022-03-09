@@ -11,8 +11,9 @@ $outputPath = $config.application.outputPath
 $echo = "mergeRender = " + $config.user.mergeRender + "; keepLog = " + $config.user.keepLog + "; ffmpegMode = " + $config.user.ffmpegMode + "; framerate = " + $config.user.framerate + "; renderScale = " + $config.user.renderScale.enabled
 if ($config.user.renderScale.enabled) { $echo += "; resolution = " + $config.user.renderScale.resolution}
 Write-Output "Starting quake3e_render.ps1 with the following settings:" $echo
-do { $msgboxResult = Read-Host "Are those settings correct? (y/n)"} while(-not @("y","n").Contains($msgboxResult))
+do { $msgboxResult = Read-Host "Are those settings correct? (y/n) "} while(-not @("y","n").Contains($msgboxResult))
 if ($msgboxResult -eq "n") { exit }
+Write-Output " "
 
 # === APPLICATION === 
 
@@ -20,7 +21,6 @@ if ($mergeRender){
     Remove-Item .\zz_render\merge_rendertemp\*.mp4
     
     if (Test-Path -PathType Leaf "$outputPath\merge_demolist.txt"){ Remove-Item "$outputPath\merge_demolist.txt" }
-
     Write-Output "ffconcat version 1.0" | Out-File -Encoding ascii .\zz_render\mergerenderlist.txt
 }
 
