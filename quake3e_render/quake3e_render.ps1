@@ -63,7 +63,7 @@ if (Test-Path -PathType Leaf .\zz_render\session.json) {
 }
 
 # == Demo List Creation == 
-Write-Output "Creating renderlist..." " "
+Write-Output "=== Creating render list ===" " "
 
 $temp_firstdemo = $true
 :createRenderList foreach($file in $(Get-ChildItem .\render_input\ | Sort-Object -Property LastWriteTime)){
@@ -139,7 +139,7 @@ if ( -not $skipRenderListCreation) { # no new session created, no need to overwr
     writeSession
 }
 
-Write-Output " " "Starting render..."
+Write-Output " " "=== Starting render ===" " "
 # == Render Loop == 
 $currentDuration = 0
 :renderLoop foreach($demo in $session.demo){
@@ -149,6 +149,7 @@ $currentDuration = 0
     $game = $demo.game
 
     if ($demo.renderFinished) { # Demo already rendered, skip it
+        Write-Output "Skipping ""$demoName""..." " "
         continue :renderLoop
     }
 	
@@ -203,8 +204,8 @@ $currentDuration = 0
     if($config.user.keepFFmpegLogs -and -not $config.user.mergeRender){
         if ($config.user.compressLogs){
             Rename-Item ".\$game\videos\$captureName.mp4-log.txt" "$captureName.log"
-            .\zz_tools\7za.exe a "$game\videos\$captureName.log.gz" "$game\videos\$captureName.log" -mx=9
-            Move-Item ".\$game\videos\$captureName.log.gz" "$outputPath\$demoName.log.gz"
+            .\zz_tools\7za.exe a "$game\videos\$captureName.log.gz" "$game\videos\$demoName.log" -mx=9 | Out-Null
+            Move-Item ".\$game\videos\$demoName.log.gz" "$outputPath\$demoName.log.gz"
         } else {
             Move-Item -Force ".\$game\videos\$captureName.mp4-log.txt" "$outputPath\$demoName.log"
         }
@@ -231,7 +232,7 @@ writeSession
 $temp_date_formatted = $($session.date.start | Get-Date -UFormat "%Y_%m_%d-%H_%M_%S")
 
 if ($config.user.compressLogs){
-    .\zz_tools\7za.exe a "zz_render\logs\session-$temp_date_formatted.json.gz" ".\zz_render\session.json" -mx=9
+    .\zz_tools\7za.exe a "zz_render\logs\session-$temp_date_formatted.json.gz" ".\zz_render\session.json" -mx=9 | Out-Null
     Remove-Item ".\zz_render\session.json"
 } else {
     Move-Item ".\zz_render\session.json" ".\zz_render\logs\session-$temp_date_formatted.json"
