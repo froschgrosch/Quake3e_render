@@ -63,7 +63,7 @@ if (Test-Path -PathType Leaf .\zz_render\session.json) {
 }
 
 # == Demo List Creation == 
-Write-Output "Creating renderlist..."
+Write-Output "Creating renderlist..." " "
 
 $temp_firstdemo = $true
 :createRenderList foreach($file in $(Get-ChildItem .\render_input\ | Sort-Object -Property LastWriteTime)){
@@ -139,7 +139,7 @@ if ( -not $skipRenderListCreation) { # no new session created, no need to overwr
     writeSession
 }
 
-
+Write-Output " " "Starting render..."
 # == Render Loop == 
 $currentDuration = 0
 :renderLoop foreach($demo in $session.demo){
@@ -147,6 +147,10 @@ $currentDuration = 0
     $captureName = $demo.captureName
     $demoName = $demo.fileName_truncated
     $game = $demo.game
+
+    if ($demo.renderFinished) { # Demo already rendered, skip it
+        continue :renderLoop
+    }
 	
     if ($config.user.mergeRender) {
         Write-Output "file temp/merge/$captureName.mp4" | Out-File -Append -Encoding ascii .\zz_render\temp\mergelist.txt
@@ -172,15 +176,15 @@ $currentDuration = 0
     $q3e_proc = Start-Process -PassThru -ArgumentList $q3e_args -FilePath .\quake3e.x64.exe
     $temp_renderTime = Measure-Command {Wait-Process -InputObject $q3e_proc}
 
-    Start-Sleep 3
-
+    
     Write-Output $(-join ("Time in minutes: ", $temp_renderTime.TotalMinutes)) " "
     
     $demo.renderFinished = $true
     Add-Member -InputObject $demo -MemberType NoteProperty -Name renderTime -Value $temp_renderTime
-    
     writeSession
-
+    
+ 
+    Start-Sleep 3  # wait in case file is not yet free
     if ($config.user.mergeRender){
         $ffprobeData = $(ffprobe -v error -hide_banner -of json -show_entries format ".\$game\videos\$captureName.mp4") | ConvertFrom-Json
         $timestamp = $("{0:hh\:mm\:ss}" -f $([timespan]::fromseconds($currentDuration)))
@@ -208,8 +212,6 @@ $currentDuration = 0
         Remove-Item ".\$game\videos\$captureName.mp4-log.txt"
     }
     Remove-Item $(-join('.\', $game , '\demos\', $captureName, $demo.fileExtension))
- 
-    Start-Sleep 3
 }
 
 # Merge with ffmpeg
