@@ -200,7 +200,7 @@ $currentDuration = 0
     } else {
         Remove-Item ".\$game\videos\$captureName.mp4-log.txt"
     }
-    Remove-Item $(-join('.\', $game , '\demos\', $captureName, '.', $demo.fileExtension))
+    Remove-Item $(-join('.\', $game , '\demos\', $captureName, $demo.fileExtension))
  
     Start-Sleep 3
 }
