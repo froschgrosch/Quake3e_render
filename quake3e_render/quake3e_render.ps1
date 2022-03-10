@@ -117,7 +117,7 @@ $temp_firstdemo = $true
     $temp_demo = New-Object -TypeName PSObject
 
     Add-Member -Force -InputObject $temp_demo -MemberType NoteProperty -Name captureName -Value $(randomAlphanumeric(11))
-    Add-Member -Force -InputObject $temp_demo -MemberType NoteProperty -Name game -Value $temp_json.gameStates.configStringValues.fs_game
+    Add-Member -Force -InputObject $temp_demo -MemberType NoteProperty -Name game -Value $temp_json.gameStates[0].configStringValues.fs_game
     Add-Member -Force -InputObject $temp_demo -MemberType NoteProperty -Name fileName -Value $file.Name
     Add-Member -Force -InputObject $temp_demo -MemberType NoteProperty -Name fileName_truncated -Value $(truncateFilename($file))
     Add-Member -Force -InputObject $temp_demo -MemberType NoteProperty -Name fileExtension -Value $file.Extension
