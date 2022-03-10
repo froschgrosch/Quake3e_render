@@ -1,6 +1,6 @@
 # quake3_render
 
-A Powershell application to aid in demo rendering. Run with *Right-click\Run with powershell* as some paths in the script are relative. At the moment, only demos in the **.dm_68** format are supported.
+A Powershell application to aid in demo rendering. Run with *Right-click\Run with powershell* as some paths in the script are relative.
 
 ## Installation
 
