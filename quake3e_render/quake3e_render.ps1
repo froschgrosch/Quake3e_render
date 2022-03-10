@@ -184,8 +184,18 @@ $currentDuration = 0
     Add-Member -Force -InputObject $demo -MemberType NoteProperty -Name renderTime -Value $temp_renderTime
     writeSession
     
- 
-    Start-Sleep 3  # wait in case file is not yet free
+    $file = Get-Item ".\$game\videos\$captureName.mp4"
+    do {
+        try {
+            $oStream = $file.Open([System.IO.FileMode]::Open, [System.IO.FileAccess]::ReadWrite, [System.IO.FileShare]::None)
+            if ($oStream) { $oStream.Close() }
+            break
+        } catch {
+            Start-Sleep 0.5
+        }
+    } while ($true)
+
+    Start-Sleep 5  # wait in case file is not yet free
     if ($config.user.mergeRender){
         $ffprobeData = $(ffprobe -v error -hide_banner -of json -show_entries format ".\$game\videos\$captureName.mp4") | ConvertFrom-Json
         $timestamp = $("{0:hh\:mm\:ss}" -f $([timespan]::fromseconds($currentDuration)))
@@ -227,9 +237,7 @@ if ($config.user.mergeRender){
 Add-Member -InputObject $session.date -MemberType NoteProperty -Name end -Value $(Get-Date)
 writeSession
 
-
-$temp_date_formatted = $($session.date.start | Get-Date -UFormat "%Y_%m_%d-%H_%M_%S")
-
+$temp_date_formatted = $($session.date.end | Get-Date -UFormat "%Y_%m_%d-%H_%M_%S")
 if ($config.user.compressLogs){
     .\zz_tools\7za.exe a "zz_render\logs\session-$temp_date_formatted.json.gz" ".\zz_render\session.json" -mx=9 -sdel | Out-Null
 } else {
