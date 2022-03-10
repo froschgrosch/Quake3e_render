@@ -21,7 +21,11 @@ Your Q3 folder
 |---render_input/
 |---render_output/
 |---zz_render/
-|   |---merge_rendertemp/
+|   |---config.json
+|   |---logs/
+|   |---temp/
+|       |---merge/
+|
 |---zz_tools/
 |   |---UDT_json.exe
 |
