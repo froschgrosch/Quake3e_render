@@ -181,7 +181,7 @@ $currentDuration = 0
     Write-Output $(-join ("Time in minutes: ", $temp_renderTime.TotalMinutes)) " "
     
     $demo.renderFinished = $true
-    Add-Member -InputObject $demo -MemberType NoteProperty -Name renderTime -Value $temp_renderTime
+    Add-Member -Force -InputObject $demo -MemberType NoteProperty -Name renderTime -Value $temp_renderTime
     writeSession
     
  
@@ -204,7 +204,7 @@ $currentDuration = 0
     if($config.user.keepFFmpegLogs -and -not $config.user.mergeRender){
         if ($config.user.compressLogs){
             Rename-Item ".\$game\videos\$captureName.mp4-log.txt" "$demoName.log"
-            .\zz_tools\7za.exe a $(-join $(Resolve-Path $outputPath.Path) + "\$demoName.log.gz") "$game\videos\$demoName.log" -mx=9 -sdel | Out-Null
+            .\zz_tools\7za.exe a $(-join $(Resolve-Path $outputPath).Path + "\$demoName.log.gz") "$game\videos\$demoName.log" -mx=9 -sdel | Out-Null
         } else {
             Move-Item -Force ".\$game\videos\$captureName.mp4-log.txt" "$outputPath\$demoName.log"
         }
