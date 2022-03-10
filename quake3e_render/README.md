@@ -6,10 +6,10 @@ A Powershell application to aid in demo rendering. Run with *Right-click\Run wit
 
 ### Downloads
 
-    - [ffmpeg](http://ffmpeg.org/download.html)
-        - ffmpeg.exe and ffprobe.exe
-    - [UDT]
-        - UDT_json.exe
+- [ffmpeg](http://ffmpeg.org/download.html)
+    - ffmpeg.exe and ffprobe.exe
+- [UDT](https://github.com/mightycow/uberdemotools)
+    - UDT_json.exe
 
 ### File structure
 
