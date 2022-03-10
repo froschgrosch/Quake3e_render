@@ -203,9 +203,8 @@ $currentDuration = 0
     
     if($config.user.keepFFmpegLogs -and -not $config.user.mergeRender){
         if ($config.user.compressLogs){
-            Rename-Item ".\$game\videos\$captureName.mp4-log.txt" "$captureName.log"
-            .\zz_tools\7za.exe a "$game\videos\$captureName.log.gz" "$game\videos\$demoName.log" -mx=9 | Out-Null
-            Move-Item ".\$game\videos\$demoName.log.gz" "$outputPath\$demoName.log.gz"
+            Rename-Item ".\$game\videos\$captureName.mp4-log.txt" "$demoName.log"
+            .\zz_tools\7za.exe a $(-join $(Resolve-Path $outputPath.Path) + "\$demoName.log.gz") "$game\videos\$demoName.log" -mx=9 -sdel | Out-Null
         } else {
             Move-Item -Force ".\$game\videos\$captureName.mp4-log.txt" "$outputPath\$demoName.log"
         }
@@ -232,8 +231,7 @@ writeSession
 $temp_date_formatted = $($session.date.start | Get-Date -UFormat "%Y_%m_%d-%H_%M_%S")
 
 if ($config.user.compressLogs){
-    .\zz_tools\7za.exe a "zz_render\logs\session-$temp_date_formatted.json.gz" ".\zz_render\session.json" -mx=9 | Out-Null
-    Remove-Item ".\zz_render\session.json"
+    .\zz_tools\7za.exe a "zz_render\logs\session-$temp_date_formatted.json.gz" ".\zz_render\session.json" -mx=9 -sdel | Out-Null
 } else {
     Move-Item ".\zz_render\session.json" ".\zz_render\logs\session-$temp_date_formatted.json"
 }
