@@ -64,6 +64,6 @@ Your Q3 folder
 - `"validGames" : [ "baseq3" ]`
     - Put a list of the installed mods here. If the demo's fs_game isn't in here, it will be skipped.
 - `"validDemoFormats" : [ ".dm_68" ]`
-    -Put a list of the valid demo formats here.
+    - Put a list of the valid demo formats here.
 - `"ffmpegPipeFormats" : [ "\"-preset medium -crf 23 -vcodec libx264 -flags +cgop -pix_fmt yuv420 -bf 2 -codec:a aac -strict -2 -b:a 160k -r:a 22050 -movflags faststart\"" ]`
     - Here the different ffmpeg configurations are stored. You can put one for sofware rendering and one for hardware rendering, for example. 
