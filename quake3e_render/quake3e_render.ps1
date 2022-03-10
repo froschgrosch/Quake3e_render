@@ -34,7 +34,7 @@ function writeSession { # Saves the current session to a json file
 $config = Get-Content .\zz_render\config.json | ConvertFrom-Json
 $outputPath = $config.application.outputPath
 
-$echo = "mergeRender = " + $config.user.mergeRender + "; keepLog = " + $config.user.keepLog + "; ffmpegMode = " + $config.user.ffmpegMode + "; framerate = " + $config.user.framerate + "; renderScale = " + $config.user.renderScale.enabled
+$echo = "mergeRender = " + $config.user.mergeRender + "; keepFFmpegLogs = " + $config.user.keepFFmpegLogs + "; ffmpegMode = " + $config.user.ffmpegMode + "; framerate = " + $config.user.framerate + "; renderScale = " + $config.user.renderScale.enabled
 if ($config.user.renderScale.enabled) { $echo += "; resolution = " + $config.user.renderScale.resolution}
 Write-Output "Starting quake3e_render.ps1 with the following settings:" $echo
 if ( -not $(YNquery("Are those settings correct?"))) { exit }
@@ -175,11 +175,12 @@ $currentDuration = 0
     Start-Sleep 3
 
     Write-Output $(-join ("Time in minutes: ", $temp_renderTime.TotalMinutes)) " "
+    
+    $demo.renderFinished = $true
     Add-Member -InputObject $demo -MemberType NoteProperty -Name renderTime -Value $temp_renderTime
     
     writeSession
 
-    
     if ($config.user.mergeRender){
         $ffprobeData = $(ffprobe -v error -hide_banner -of json -show_entries format ".\$game\videos\$captureName.mp4") | ConvertFrom-Json
         $timestamp = $("{0:hh\:mm\:ss}" -f $([timespan]::fromseconds($currentDuration)))
@@ -195,8 +196,14 @@ $currentDuration = 0
         Move-Item -Force ".\$game\videos\$captureName.mp4" "$outputPath\$demoName.mp4"
     }
     
-    if($config.user.keepLog -and -not $config.user.mergeRender){
-        Move-Item -Force ".\$game\videos\$captureName.mp4-log.txt" "$outputPath\$demoName.log"
+    if($config.user.keepFFmpegLogs -and -not $config.user.mergeRender){
+        if ($config.user.compressLogs){
+            Rename-Item ".\$game\videos\$captureName.mp4-log.txt" "$captureName.log"
+            .\zz_tools\7za.exe a "$game\videos\$captureName.log.gz" "$game\videos\$captureName.log" -mx=9
+            Move-Item ".\$game\videos\$captureName.log.gz" "$outputPath\$demoName.log.gz"
+        } else {
+            Move-Item -Force ".\$game\videos\$captureName.mp4-log.txt" "$outputPath\$demoName.log"
+        }
     } else {
         Remove-Item ".\$game\videos\$captureName.mp4-log.txt"
     }
@@ -220,8 +227,13 @@ writeSession
 
 
 $temp_date_formatted = $($session.date.start | Get-Date -UFormat "%Y_%m_%d-%H_%M_%S")
-Move-Item ".\zz_render\session.json" ".\zz_render\logs\session-$temp_date_formatted.json"
 
+if ($config.user.compressLogs){
+    .\zz_tools\7za.exe a "zz_render\logs\session-$temp_date_formatted.json.gz" ".\zz_render\session.json" -mx=9
+    Remove-Item ".\zz_render\session.json"
+} else {
+    Move-Item ".\zz_render\session.json" ".\zz_render\logs\session-$temp_date_formatted.json"
+}
 Write-Output "Rendering finished."
 
 #shutdown -s -t 60

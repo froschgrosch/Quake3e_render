@@ -4,7 +4,8 @@
         "renderScale" : { "enabled": 0, "resolution" : [3840, 2160] },
         "framerate": 60,
         "ffmpegMode" : 0,
-        "keepLog" : 0
+        "keepFFmpegLogs" : 0,
+        "compressLogs" : 0
     },
 
     "application" : {
