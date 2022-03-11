@@ -29,27 +29,21 @@ function writeSession { # Saves the current session to a json file
     ConvertTo-Json -InputObject $session | Out-File .\zz_render\session.json
 }
 
-function appendToFFmpegLog($file) { # Append the content of the given file to merge_ffmpeg.log
-
-    
-    $file_name = $file.Name
-
-    $(-join $($(Get-Content '.\zz_render\temp\merge_ffmpeg.log')), "===== FILE: $file_name.log =====", $(Get-Content $file)) | Out-File -Append .\zz_render\temp\merge_ffmpeg.log.1
-    
-    Remove-Item .\zz_render\temp\merge_ffmpeg.log
-    Rename-Item .\zz_render\temp\merge_ffmpeg.log.1 merge_ffmpeg.log
-}
-
 # loading config
 $config = Get-Content .\zz_render\config.json | ConvertFrom-Json
 $outputPath = $config.application.outputPath
 
-$echo = "mergeRender = " + $config.user.mergeRender + "; logFFmpeg = " + $config.user.logFFmpeg + "; ffmpegMode = " + $config.user.ffmpegMode + "; framerate = " + $config.user.framerate + "; renderScale = " + $config.user.renderScale.enabled
-if ($config.user.renderScale.enabled) { $echo += "; resolution = " + $config.user.renderScale.resolution}
-Write-Output "=== QUAKE3E RENDER PS APPLICATION === " $echo
-if ( -not $(YNquery("Are those settings correct?"))) { exit }
-Write-Output " "
+# check settings
+$echo = 'mergeRender = ' + $config.user.mergeRender
+$echo1 = 'renderScale = ' + $config.user.renderScale.enabled
+if ($config.user.renderScale.enabled) { $echo1 += ' (resolution: ' + $config.user.renderScale.resolution +')'}
+$echo2 = 'framerate = ' + $config.user.framerate
+$echo3 = 'ffmpegMode = ' + $config.user.ffmpegMode + ' (' +$config.application.ffmpegPipeFormats[$config.user.ffmpegMode][1] + ')'
+$echo4 = 'logFFmpeg = ' + $config.user.logFFmpeg
+$echo5 = 'logSession = ' + $config.user.logSession
 
+Write-Output "=== QUAKE3E RENDER PS APPLICATION === " $echo $echo1 $echo2 $echo3 $echo4 $echo5
+if ( -not $(YNquery("Are those settings correct?"))) { exit }
 
 # === APPLICATION === 
 
@@ -76,7 +70,7 @@ if ($config.user.mergeRender -and -not $continueSession){
 }
 
 # == Demo List Creation == 
-Write-Output "=== Creating render list ===" " "
+Write-Output " " "=== Creating render list ===" " "
 
 $temp_firstdemo = $true
 :createRenderList foreach($file in $(Get-ChildItem .\render_input\ | Sort-Object -Property LastWriteTime)){
@@ -181,7 +175,7 @@ $env:FFREPORT = ''
         "+seta r_renderScale " +    $config.user.renderScale.enabled,
         "+seta r_renderWidth " +    $config.user.renderScale.resolution[0],
         "+seta r_renderHeight " +   $config.user.renderScale.resolution[1],
-        "+seta cl_aviPipeFormat " + $config.application.ffmpegPipeFormats[$config.user.ffmpegMode],
+        "+seta cl_aviPipeFormat " + $config.application.ffmpegPipeFormats[$config.user.ffmpegMode][0],
         "+seta cl_aviFrameRate " +  $config.user.framerate,
         "+demo $captureName",
         "+video-pipe $captureName"
