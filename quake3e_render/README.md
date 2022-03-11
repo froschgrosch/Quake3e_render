@@ -6,14 +6,21 @@ A Powershell application to aid in demo rendering. Run with *Right-click\Run wit
 
 ### Downloads
 
-- [ffmpeg](http://ffmpeg.org/download.html)
-    - ffmpeg.exe and ffprobe.exe
-- [UDT](https://github.com/mightycow/uberdemotools)
-    - UDT_json.exe
-- [7-zip (only required if you want to use log compression)](https://7-zip.org/download.html)
-    - 7za.exe
+- **ffmpeg**
+    - [Download from *ffmpeg.org*](http://ffmpeg.org/download.html)
+    - Required files:
+        - ffmpeg.exe 
+        - ffprobe.exe
+- **UberDemoTools**
+    - [Download from *Github*](https://github.com/mightycow/uberdemotools)
+    - Required files:
+        - UDT_json.exe
+- **7-zip** command line version
+    - [Download from *7-zip.org*](https://7-zip.org/download.html)
+    - Required files:
+        - 7za.exe
 
-### File structure
+### File / folder structure
 
 ```
 Your Q3 folder
@@ -35,6 +42,7 @@ Your Q3 folder
 |
 |---ffmpeg.exe
 |---ffprobe.exe
+|
 |---quake3e.x64.exe
 |---quake3e_render.ps1
 
@@ -44,9 +52,9 @@ Your Q3 folder
 
 
 - `"mergeRender" : 0`
-    - When set to 1, all rendered demos will be merged into one videofile with ffmpeg.
+    - When set to 1, all rendered demos will be merged into one video file with ffmpeg.
 - `"renderScale" : { "enabled": 0, "resolution" : [3840, 2160] }`
-    - When `enabled` is set to 1, the cvar r_renderScale will be enabled. It enables rendering at resolutions greater than screen resolution. Requires `r_fbo 1`. The resolution is specified in the `resolution` array
+    - When `enabled` is set to 1, the cvar r_renderScale will be enabled. It enables rendering at resolutions greater than screen resolution. Requires `r_fbo 1`. The resolution is specified in the `resolution` array.
 - `"framerate": 60`
     - Set the output framerate.
 - `"ffmpegMode" : 0`
@@ -69,4 +77,5 @@ Your Q3 folder
 - `"validDemoFormats" : [ ".dm_68" ]`
     - Put a list of the valid demo formats here.
 - `"ffmpegPipeFormats" : [ "\"-preset medium -crf 23 -vcodec libx264 -flags +cgop -pix_fmt yuv420 -bf 2 -codec:a aac -strict -2 -b:a 160k -r:a 22050 -movflags faststart\"" , "x264 crf23 medium]`
-    - Here the different ffmpeg configurations are stored. You can put one for sofware rendering and one for hardware rendering, for example. The first element of the array is the actual line for `cl_aviPipeFormat`, the second element is the description that will be displayed when checking settings.
+    - Here the different ffmpeg configurations are stored. You can put one for sofware rendering and one for hardware rendering, for example. 
+    - The first element of the array is the actual line for `cl_aviPipeFormat`, the second element is the description that will be displayed when checking settings.
