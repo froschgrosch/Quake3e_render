@@ -42,7 +42,7 @@ $echo3 = 'ffmpegMode = ' + $config.user.ffmpegMode + ' (' +$config.application.f
 $echo4 = 'logFFmpeg = ' + $config.user.logFFmpeg
 $echo5 = 'logSession = ' + $config.user.logSession
 
-Write-Output "=== QUAKE3E RENDER PS APPLICATION === " $echo $echo1 $echo2 $echo3 $echo4 $echo5
+Write-Output "=== quake3e_render Powershell application === " ' ' $echo $echo1 $echo2 $echo3 $echo4 $echo5
 if ( -not $(YNquery("Are those settings correct?"))) { exit }
 
 # === APPLICATION === 
@@ -70,7 +70,7 @@ if ($config.user.mergeRender -and -not $continueSession){
 }
 
 # == Demo List Creation == 
-Write-Output " " "=== Creating render list ===" " "
+Write-Output ' ' "=== Creating render list ===" ' '
 
 $temp_firstdemo = $true
 :createRenderList foreach($file in $(Get-ChildItem .\render_input\ | Sort-Object -Property LastWriteTime)){
@@ -102,7 +102,7 @@ $temp_firstdemo = $true
         if (YNquery("This demo was already rendered at some point. Would you like to render again?")){
             Remove-Item "$outputPath\$temp_demoName.mp4"
         } else {
-            Write-Output " "
+            Write-Output ' '
             continue createRenderList
         }
     }
@@ -148,7 +148,7 @@ if (-not $continueSession) { # fresh session
 }
 
 
-Write-Output " " "=== Starting render ===" " "
+Write-Output ' ' "=== Starting render ===" ' '
 # == Render Loop == 
 $currentDuration = 0
 $env:FFREPORT = ''
@@ -158,26 +158,29 @@ $env:FFREPORT = ''
     $captureName = $demo.captureName
     $demoName = $demo.fileName_truncated
     $game = $demo.game
+    
+    $fileName = $demo.fileName
+    $fileExt = $demo.fileExtension
 
     if ($demo.renderFinished) { # Demo already rendered, skip it
-        Write-Output "Skipping ""$demoName""..." " "
+        Write-Output "Skipping ""$demoName""..." ' '
         continue :renderLoop
     }
 	
     Write-Output "Rendering ""$demoName""... (capturename: $captureName)"
 
-    Copy-Item ".\render_input\$demoName.dm_68" ".\$game\demos\$captureName.dm_68"
+    Copy-Item ".\render_input\$fileName" ".\$game\demos\$captureName$fileExt"
     
     $q3e_args = @(
         "+set fs_game $game",
-        "+set nextdemo quit",
-        "+seta in_nograb 1",
-        "+seta r_renderScale " +    $config.user.renderScale.enabled,
-        "+seta r_renderWidth " +    $config.user.renderScale.resolution[0],
-        "+seta r_renderHeight " +   $config.user.renderScale.resolution[1],
-        "+seta cl_aviPipeFormat " + $config.application.ffmpegPipeFormats[$config.user.ffmpegMode][0],
-        "+seta cl_aviFrameRate " +  $config.user.framerate,
-        "+demo $captureName",
+        '+set nextdemo quit',
+        '+seta in_nograb 1',
+        $('+seta r_renderScale ' + $config.user.renderScale.enabled),
+        $('+seta r_renderWidth ' + $config.user.renderScale.resolution[0]),
+        $('+seta r_renderHeight ' + $config.user.renderScale.resolution[1]),
+        $('+seta cl_aviPipeFormat ' + $config.application.ffmpegPipeFormats[$config.user.ffmpegMode][0]),
+        $('+seta cl_aviFrameRate ' +  $config.user.framerate),
+        $('+demo ' + $demo.captureName + $demo.fileExtension),
         "+video-pipe $captureName"
     )
 
@@ -185,7 +188,7 @@ $env:FFREPORT = ''
     $temp_renderTime = Measure-Command {Wait-Process -InputObject $q3e_proc}
 
     
-    Write-Output $(-join ("Time in minutes: ", $temp_renderTime.TotalMinutes)) " "
+    Write-Output $(-join ("Time in minutes: ", $temp_renderTime.TotalMinutes)) ' '
     
     $demo.renderFinished = $true
     Add-Member -Force -InputObject $demo -MemberType NoteProperty -Name renderTime -Value $temp_renderTime
@@ -247,7 +250,7 @@ $env:FFREPORT = ''
             Remove-Item ".\$game\videos\$captureName.mp4-log.txt"
         }
     }    
-    Remove-Item $(-join('.\', $game , '\demos\', $captureName, $demo.fileExtension))
+    Remove-Item ".\$game\demos\$captureName$fileExt"
 }
 
 
