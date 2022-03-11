@@ -27,6 +27,7 @@ Your Q3 folder
 |   |---logs/
 |   |---temp/
 |       |---merge/
+|       |---merge_ffmpeglogs/
 |
 |---zz_tools/
 |   |---UDT_json.exe
@@ -50,10 +51,12 @@ Your Q3 folder
     - Set the output framerate.
 - `"ffmpegMode" : 0`
     - Select index of the ffmpeg pipe format mode, which is stored in `ffmpegPipeFormats` variable. 
-- `"keepFFmpegLogs" : 0`
-    - When set to 1, the ffmpeg encoding logs will be copied to the output path.
-- `"compressLogs" : 0`
-    - When set to 1, all logs (session logs and ffmpeg logs) will be compressed with 7zip (gzip format)
+- `"logFFmpeg" : 0`
+    - When set to 1, the ffmpeg encoding logs will be moved to the output path.
+    - When set to 2, the logs will be compressed and moved to the output path.
+- `"logSession" : 0`
+    - When set to 1, *session.json* will be moved to the *zz_render\logs\\* directory
+    - When set to 2, *session.json* will be compressed and moved to the *zz_render\logs\\* directory
 
 ## Application configuration
 
