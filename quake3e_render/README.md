@@ -39,9 +39,9 @@ Your Q3 folder
 |---zz_tools/
 |   |---UDT_json.exe
 |   |---7za.exe
+|   |---ffprobe.exe
 |
 |---ffmpeg.exe
-|---ffprobe.exe
 |
 |---quake3e.x64.exe
 |---quake3e_render.ps1

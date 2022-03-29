@@ -211,7 +211,7 @@ $env:FFREPORT = ''
     if ($config.user.mergeRender){      
         
         # write the mergedemolist 
-        $ffprobeData = $(ffprobe -v error -hide_banner -of json -show_entries format ".\$game\videos\$captureName.mp4") | ConvertFrom-Json
+        $ffprobeData = $(.\zz_tools\ffprobe.exe -v error -hide_banner -of json -show_entries format ".\$game\videos\$captureName.mp4") | ConvertFrom-Json
 
         if ($ffprobeData.format.duration -gt 10) { # YouTube description chapters, for which this feature is meant for, need to be at least 10 seconds long.
 
