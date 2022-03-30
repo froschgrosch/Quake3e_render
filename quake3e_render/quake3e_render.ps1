@@ -59,7 +59,6 @@ if (Test-Path -PathType Leaf .\zz_render\session.json) {
 
     Add-Member -InputObject $temp_date -MemberType NoteProperty -Name start -Value $(Get-Date)
     Add-Member -InputObject $session -MemberType NoteProperty -Name date -Value $temp_date
-    Add-Member -InputObject $session -MemberType NoteProperty -Name ffmpegModeDesc -Value $config.application.ffmpegPipeFormats[$config.user.ffmpegMode][1]
 }
 
 if ($config.user.mergeRender -and -not $continueSession){
@@ -192,7 +191,9 @@ $env:FFREPORT = ''
     Write-Output $(-join ("Time in minutes: ", $temp_renderTime.TotalMinutes)) ' '
     
     $demo.renderFinished = $true
-    Add-Member -Force -InputObject $demo -MemberType NoteProperty -Name renderTime -Value $temp_renderTime
+    Add-Member -Force -InputObject $demo -MemberType NoteProperty -Name renderTime -Value $temp_renderTime  
+    Add-Member -Force -InputObject $demo -MemberType NoteProperty -Name ffmpegModeDesc -Value $config.application.ffmpegPipeFormats[$config.user.ffmpegMode][1]
+
     writeSession
 
     
