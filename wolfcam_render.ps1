@@ -1,5 +1,5 @@
 # Powershell application to aid in demo rendering.
-# https://github.com/froschgrosch/quake3-scripts
+# https://github.com/froschgrosch/Quake3e_render
 
 
 # === FUNCTION DECLARATIONS ===
@@ -43,7 +43,7 @@ $echo4 = 'logFFmpeg = ' + $config.user.logFFmpeg
 $echo5 = 'logSession = ' + $config.user.logSession
 $echo6 = 'fontScale = ' + $config.user.fontScale.target + ' @ ' + $config.user.fontscale.referenceResolution
 
-Write-Output '=== quake3e_render Powershell application ===' ' ' $echo $echo1 $echo2 $echo3 $echo4 $echo5 $echo6
+Write-Output '=== wolfcamql_render Powershell application ===' ' ' $echo $echo1 $echo2 $echo3 $echo4 $echo5 $echo6
 if ( -not $(YNquery("Are those settings correct?"))) { exit }
 
 # === APPLICATION === 
@@ -108,14 +108,9 @@ $temp_firstdemo = $true
         }
     }
 
-    $udtFilename = "..\render_input\" + $file.name
-    $temp_json = .\zz_tools\UDT_json.exe -a=g -c $udtFilename | ConvertFrom-Json
+    # $udtFilename = "..\render_input\" + $file.name
+    # $temp_json = .\zz_tools\UDT_json.exe -a=g -c $udtFilename | ConvertFrom-Json
     
-    # Check if demo game is in the valid games list 
-    if (-not $config.application.validGames.Contains($temp_json.gameStates[0].configStringValues.fs_game)){
-        Write-Output $(-join ("""", $temp_json.gameStates[0].configStringValues.fs_game , """ is not a valid game, skipping...)"))
-        continue createRenderList
-    }
 
     # demo is valid, ready for further processing
 
@@ -126,7 +121,7 @@ $temp_firstdemo = $true
     $captureName = randomAlphanumeric(11)
 
     Add-Member -Force -InputObject $temp_demo -MemberType NoteProperty -Name captureName -Value $captureName
-    Add-Member -Force -InputObject $temp_demo -MemberType NoteProperty -Name game -Value $temp_json.gameStates[0].configStringValues.fs_game
+    #Add-Member -Force -InputObject $temp_demo -MemberType NoteProperty -Name game -Value $temp_json.gameStates[0].configStringValues.fs_game
     Add-Member -Force -InputObject $temp_demo -MemberType NoteProperty -Name fileName -Value $file.Name
     Add-Member -Force -InputObject $temp_demo -MemberType NoteProperty -Name fileName_truncated -Value $(truncateFilename($file))
     Add-Member -Force -InputObject $temp_demo -MemberType NoteProperty -Name fileExtension -Value $file.Extension
@@ -156,12 +151,12 @@ $env:FFREPORT = ''
 
 # render scaling stuff
 $q3e_renderScale = 0
-$q3e_fontScale = 1
+$wc_fontScale = 1
 if ($config.user.renderScale.enabled){
     $q3e_renderScale = $config.application.renderScaleMode
-    $q3e_fontScale = $config.user.fontScale.target * ($config.user.renderScale.resolution[1] / $config.user.fontScale.referenceResolution[1]) 
+    $wc_fontScale = $config.user.fontScale.target * ($config.user.renderScale.resolution[1] / $config.user.fontScale.referenceResolution[1]) 
 
-    Write-Output "Console font scale set to $q3e_fontScale."
+    Write-Output "Console font scale set to $wc_fontScale."
 }
     
 
@@ -169,7 +164,7 @@ if ($config.user.renderScale.enabled){
     
     $captureName = $demo.captureName
     $demoName = $demo.fileName_truncated
-    $game = $demo.game
+    #$game = $demo.game
     
     $fileName = $demo.fileName
     $fileExt = $demo.fileExtension
@@ -181,25 +176,26 @@ if ($config.user.renderScale.enabled){
 	
     Write-Output "Rendering ""$demoName""... (capturename: $captureName)"
 
-    Copy-Item ".\render_input\$fileName" ".\$game\demos\$captureName$fileExt"
+    Copy-Item ".\render_input\$fileName" ".\wolfcam-ql\demos\$captureName$fileExt"
 
 
-    $q3e_args = @(
-        "+set fs_game $game",
+    $wc_args = @(
+        "+set fs_homepath $PSScriptRoot"
         '+set nextdemo quit',
         '+seta in_nograb 1',
-        $('+seta r_renderScale ' + $q3e_renderScale),
-        $('+seta r_renderWidth ' + $config.user.renderScale.resolution[0]),
-        $('+seta r_renderHeight ' + $config.user.renderScale.resolution[1]),
-        $('+seta cl_aviPipeFormat ' + $config.application.ffmpegPipeFormats[$config.user.ffmpegMode][0]),
-        $('+seta cl_aviFrameRate ' +  $config.user.framerate),
-        $('+seta con_scale ' + $q3e_fontScale),
+        $('+seta cl_aviFrameRate ' +  $config.user.framerate), 
         $('+demo ' + $demo.captureName + $demo.fileExtension),
-        "+video-pipe $captureName"
+        "+video avi name $captureName"
+        #$('+seta r_renderScale ' + $q3e_renderScale),
+        #$('+seta r_renderWidth ' + $config.user.renderScale.resolution[0]),
+        #$('+seta r_renderHeight ' + $config.user.renderScale.resolution[1]) 
+        #$('+seta cl_aviPipeFormat ' + $config.application.ffmpegPipeFormats[$config.user.ffmpegMode][0]),
+        #$('+seta con_scale ' + $q3e_fontScale),
     )
 
-    $q3e_proc = Start-Process -PassThru -ArgumentList $q3e_args -FilePath .\quake3e.x64.exe
-    $temp_renderTime = Measure-Command {Wait-Process -InputObject $q3e_proc}
+
+    $wc_proc = Start-Process -PassThru -ArgumentList $wc_args -FilePath .\wolfcamql.exe
+    $temp_renderTime = Measure-Command {Wait-Process -InputObject $wc_proc}
 
     
     Write-Output $(-join ("Time in minutes: ", $temp_renderTime.TotalMinutes)) ' '
@@ -211,8 +207,8 @@ if ($config.user.renderScale.enabled){
     writeSession
 
     
-    $file = Get-Item ".\$game\videos\$captureName.mp4"
-    :lockFileLoop do { # wait until the rendered .mp4 is not locked anymore
+    $file = Get-Item ".\wolfcam-ql\videos\$captureName-0000.avi"
+    :lockFileLoop do { # wait until the rendered .avi is not locked anymore
         try {
             $oStream = $file.Open([System.IO.FileMode]::Open, [System.IO.FileAccess]::ReadWrite, [System.IO.FileShare]::None)
             if ($oStream) { $oStream.Close() }
@@ -223,6 +219,12 @@ if ($config.user.renderScale.enabled){
     } while ($true)
 
     Start-Sleep 1
+
+    Write-Output "Rendering with ffmpeg..."
+    
+    ./zz_tools/ffmpeg.exe -i ".\wolfcamql-\videos\$captureName-0000.avi" $config.application.ffmpegPipeFormats[$config.user.ffmpegMode][0] "$outputPath\$demoName.mp4"
+    exit
+
     if ($config.user.mergeRender){      
         
         # write the mergedemolist 
@@ -266,7 +268,7 @@ if ($config.user.renderScale.enabled){
             Remove-Item ".\$game\videos\$captureName.mp4-log.txt"
         }
     }    
-    Remove-Item ".\$game\demos\$captureName$fileExt"
+    Remove-Item ".\wolfcam-ql\demos\$captureName$fileExt"
 }
 
 
