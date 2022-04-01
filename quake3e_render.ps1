@@ -41,8 +41,9 @@ $echo2 = 'framerate = ' + $config.user.framerate
 $echo3 = 'ffmpegMode = ' + $config.user.ffmpegMode + ' (' +$config.application.ffmpegPipeFormats[$config.user.ffmpegMode][1] + ')'
 $echo4 = 'logFFmpeg = ' + $config.user.logFFmpeg
 $echo5 = 'logSession = ' + $config.user.logSession
+$echo6 = 'fontScale = ' + $config.user.fontScale.target + ' @ ' + $config.user.fontscale.referenceResolution
 
-Write-Output "=== quake3e_render Powershell application === " ' ' $echo $echo1 $echo2 $echo3 $echo4 $echo5
+Write-Output '=== quake3e_render Powershell application ===' ' ' $echo $echo1 $echo2 $echo3 $echo4 $echo5 $echo6
 if ( -not $(YNquery("Are those settings correct?"))) { exit }
 
 # === APPLICATION === 
@@ -153,6 +154,17 @@ Write-Output ' ' "=== Starting render ===" ' '
 $currentDuration = 0
 $env:FFREPORT = ''
 
+# render scaling stuff
+$q3e_renderScale = 0
+$q3e_fontScale = 1
+if ($config.user.renderScale.enabled){
+    $q3e_renderScale = $config.application.renderScaleMode
+    $q3e_fontScale = $config.user.fontScale.target * ($config.user.renderScale.resolution[1] / $config.user.fontScale.referenceResolution[1]) 
+
+    Write-Output "Console font scale set to $q3e_fontScale."
+}
+    
+
 :renderLoop foreach($demo in $session.demo){
     
     $captureName = $demo.captureName
@@ -170,16 +182,18 @@ $env:FFREPORT = ''
     Write-Output "Rendering ""$demoName""... (capturename: $captureName)"
 
     Copy-Item ".\render_input\$fileName" ".\$game\demos\$captureName$fileExt"
-    
+
+
     $q3e_args = @(
         "+set fs_game $game",
         '+set nextdemo quit',
         '+seta in_nograb 1',
-        $('+seta r_renderScale ' + $config.user.renderScale.enabled),
+        $('+seta r_renderScale ' + $q3e_renderScale),
         $('+seta r_renderWidth ' + $config.user.renderScale.resolution[0]),
         $('+seta r_renderHeight ' + $config.user.renderScale.resolution[1]),
         $('+seta cl_aviPipeFormat ' + $config.application.ffmpegPipeFormats[$config.user.ffmpegMode][0]),
         $('+seta cl_aviFrameRate ' +  $config.user.framerate),
+        $('+seta con_scale ' + $q3e_fontScale),
         $('+demo ' + $demo.captureName + $demo.fileExtension),
         "+video-pipe $captureName"
     )
