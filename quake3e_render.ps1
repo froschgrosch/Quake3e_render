@@ -35,17 +35,10 @@ function stopRender { # exits if the demo's stopAfterCurrent is set to true or a
     } elseif ($config.user.exitBehaviour -eq 1) { # exit w/ pause
         Pause
         exit 0
-    } elseif ($config.user.exitBehaviour -eq 2) { # logout
-        shutdown -l -t $config.application.shutdownTimeout
+    } elseif ($config.user.exitBehaviour -eq 2) { # shutdown
         $echo = $config.application.shutdownTimeout
-        Write-Output "Logging out in $echo seconds."
-        if (YNquery('Cancel?')) { shutdown -a }
-        exit
-    } elseif ($config.user.exitBehaviour -eq 3) { # shutdown
-        shutdown -l -t $config.application.shutdownTimeout
-        $echo = $config.application.shutdownTimeout
-        Write-Output "Shutting down in $echo seconds."
-        if (YNquery('Cancel?')) { shutdown -a }
+        shutdown -s -t $config.application.shutdownTimeout -c "Quake 3 Rendering finished. Shutting down in $echo seconds."
+        if (YNquery('Cancel shutdown?')) { shutdown -a }
         exit
     } 
 }
@@ -140,8 +133,8 @@ if ($config.user.renderScale.enabled){
 Write-Output $echo
 
 # user.exitBehaviour
-if ((0..3).Contains($config.user.exitBehaviour)){
-    $exitDesc = @('Exit w/o pause','Exit w/ pause','Logout','Shutdown')
+if ((0..2).Contains($config.user.exitBehaviour)){
+    $exitDesc = @('Exit w/o pause','Exit w/ pause','Shutdown')
     $echo = 'exitBehaviour = ' + $config.user.exitBehaviour + ' (' + $exitDesc[$config.user.exitBehaviour] + ')'
 } else {
     $echo = 'exitBehaviour = ' + $config.user.exitBehaviour + ' (invalid, defaulting to 1 (Exit w/ pause))'
@@ -174,7 +167,7 @@ if ($config.user.mergeRender -and -not $continueSession){
         Write-Output "ffconcat version 1.0" | Out-File -Encoding ascii .\zz_render\temp\ffmpeg_mergelist.txt        
 }
 
-# == Demo List Creation == 
+# === Demo List Creation ===
 Write-Output ' ' "=== Creating render list ===" ' '
 
 $temp_firstdemo = $true

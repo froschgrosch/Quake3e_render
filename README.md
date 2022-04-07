@@ -72,9 +72,8 @@ Your Q3 folder
     - Possible settings are:
         - `0` - Exit without further pausing.
         - `1` - Pause, and then exit. This is the default (and old) behaviour.
-        - `2` - Log out the windows user. 
-        - `3` - Shut down the computer.
-    - The timeout for the settings `2` and `3` is specified in the `shutdownTimeout` setting.
+        - `2` - Shut down the computer.
+    - The timeout for the shutdown is specified in the `shutdownTimeout` setting.
 
 ## Application configuration
 
@@ -93,4 +92,4 @@ Your Q3 folder
     - Sets the r_renderScale mode that quake3e should use.
     - [Here is the section in the Quake3e docs](https://github.com/ec-/Quake3e/blob/master/docs/quake3e.htm#L218)
 -  `"shutdownTimeout" : 30`
-    - Specifies the shutdown timeout for exit options 2 and 3. This is how much time you will have from when you are notified that your computer is about to shut down until it actually does it.
+    - Specifies the shutdown timeout. This is how much time you will have from when you are notified that your computer is about to shut down until it actually does it.
