@@ -253,6 +253,7 @@ if (-not $continueSession) { # fresh session
     writeSession
 }
 
+pause
 
 Write-Output ' ' "=== Starting render ===" ' '
 # == Render Loop == 
@@ -373,7 +374,7 @@ $env:FFREPORT = ''
     }    
     Remove-Item ".\$game\demos\$captureName$fileExt"
 
-    if($demo.stopAfterCurrent){
+    if($demo.stopAfterCurrent -and -not $config.user.mergeRender){
         stopRender
     }
 }
