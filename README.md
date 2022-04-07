@@ -66,6 +66,15 @@ Your Q3 folder
     - When set to 2, *session.json* will be compressed and moved to the *zz_render\logs\\* directory
 - `"fontScale" : { "target": 1, "referenceResolution" : [1920, 1080] }`
     - The console font will be scaled if renderScale is enabled. `target` is the target size at the resolution specified in `renderResolution`.
+-  `"exitBehaviour" : 1`
+    - This setting controls what happens when the demo list reaches its end.
+    - There also is a way to trigger a stop after a specific demo has finished rendering. Set `stopAfterCurrent = true` for the demo inside the *session.json* file.
+    - Possible settings are:
+        - `0` - Exit without further pausing.
+        - `1` - Pause, and then exit. This is the default (and old) behaviour.
+        - `2` - Log out the windows user. 
+        - `3` - Shut down the computer.
+    - The timeout for the settings `2` and `3` is specified in the `shutdownTimeout` setting.
 
 ## Application configuration
 
@@ -83,3 +92,5 @@ Your Q3 folder
 - `"renderScaleMode" : 3`
     - Sets the r_renderScale mode that quake3e should use.
     - [Here is the section in the Quake3e docs](https://github.com/ec-/Quake3e/blob/master/docs/quake3e.htm#L218)
+-  `"shutdownTimeout" : 30`
+    - Specifies the shutdown timeout for exit options 2 and 3. This is how much time you will have from when you are notified that your computer is about to shut down until it actually does it.

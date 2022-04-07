@@ -6,7 +6,8 @@
         "ffmpegMode" : 0,
         "logFFmpeg" : 0,
         "logSession" : 0,
-        "fontScale" : { "target": 1, "referenceResolution" : [1920, 1080] }
+        "fontScale" : { "target": 1, "referenceResolution" : [1920, 1080] },
+        "exitBehaviour" : 1
     },
 
     "application" : {
@@ -17,6 +18,7 @@
         "ffmpegPipeFormats" : [
             [ "\"-preset medium -crf 23 -vcodec libx264 -flags +cgop -pix_fmt yuv420 -bf 2 -codec:a aac -strict -2 -b:a 160k -r:a 22050 -movflags faststart\"", "x264 crf23 medium" ]
         ],
-        "renderScaleMode" :  3
+        "renderScaleMode" :  3,
+        "shutdownTimeout" : 30
     }
 }

@@ -29,21 +29,126 @@ function writeSession { # Saves the current session to a json file
     ConvertTo-Json -InputObject $session | Out-File .\zz_render\session.json
 }
 
+function stopRender { # exits if the demo's stopAfterCurrent is set to true or at the end of the render list.
+    if ($config.user.exitBehaviour -eq 0) { # exit w/o pause
+        exit 0
+    } elseif ($config.user.exitBehaviour -eq 1) { # exit w/ pause
+        Pause
+        exit 0
+    } elseif ($config.user.exitBehaviour -eq 2) { # logout
+        shutdown -l -t $config.application.shutdownTimeout
+        $echo = $config.application.shutdownTimeout
+        Write-Output "Logging out in $echo seconds."
+        if (YNquery('Cancel?')) { shutdown -a }
+        exit
+    } elseif ($config.user.exitBehaviour -eq 3) { # shutdown
+        shutdown -l -t $config.application.shutdownTimeout
+        $echo = $config.application.shutdownTimeout
+        Write-Output "Shutting down in $echo seconds."
+        if (YNquery('Cancel?')) { shutdown -a }
+        exit
+    } 
+}
+
+
 # loading config
 $config = Get-Content .\zz_render\config.json | ConvertFrom-Json
 $outputPath = $config.application.outputPath
 
-# check settings
-$echo = 'mergeRender = ' + $config.user.mergeRender
-$echo1 = 'renderScale = ' + $config.user.renderScale.enabled
-if ($config.user.renderScale.enabled) { $echo1 += ' (resolution: ' + $config.user.renderScale.resolution +')'}
-$echo2 = 'framerate = ' + $config.user.framerate
-$echo3 = 'ffmpegMode = ' + $config.user.ffmpegMode + ' (' +$config.application.ffmpegPipeFormats[$config.user.ffmpegMode][1] + ')'
-$echo4 = 'logFFmpeg = ' + $config.user.logFFmpeg
-$echo5 = 'logSession = ' + $config.user.logSession
-$echo6 = 'fontScale = ' + $config.user.fontScale.target + ' @ ' + $config.user.fontscale.referenceResolution
 
-Write-Output '=== quake3e_render Powershell application ===' ' ' $echo $echo1 $echo2 $echo3 $echo4 $echo5 $echo6
+# === SETTINGS CHECK ===
+Write-Output '=== quake3e_render Powershell application ===' ' ' 'Please check the application settings:' 
+
+# user.mergeRender
+if (@(0,1).Contains($config.user.mergeRender)){
+    $echo = 'mergeRender = ' + $config.user.mergeRender
+} else { 
+    $echo = 'mergeRender = ' + $config.user.mergeRender + '(invalid, defaults to 0)'
+    $config.user.mergeRender = 0
+}
+Write-Output $echo
+
+# user.renderScale
+if (@(0,1).Contains($config.user.renderScale.enabled)){
+    $echo = 'renderScale = ' + $config.user.renderScale.enabled
+    if ($config.user.renderScale.enabled){
+        $echo1 = ' (resolution: ' + $config.user.renderScale.resolution 
+        if ($config.user.renderScale.resolution[0] -lt 96 -or $config.user.renderScale.resolution[1] -lt 72){
+            # width and height should probably be checked separately, but this presumably is a rare case anyway.
+            $config.user.renderScale.resolution = @(96,72)
+            $echo1 += ' (invalid, defaulting to 96 * 72)'
+        }
+        $echo += $echo1 + ')'
+    }
+} else {
+    $echo = 'renderScale = ' + $config.user.renderScale.enabled + '(invalid, defaulting to 0)'
+    $config.user.renderScale.enabled = 0
+}
+Write-Output $echo
+
+# user.framerate
+if ($config.user.framerate -lt 1){
+    $echo = 'frameRate = ' + $config.user.framerate + '(invalid, defaulting to 30)'
+    $config.user.framerate = 30
+} elseif ($config.user.framerate % 1 -gt 0) {
+    $rateRounded = [math]::Floor($config.user.framerate)
+    $echo = 'frameRate = ' + $config.user.framerate + '(not integral, rounding down to )' + $rateRounded
+    $config.user.framerate = $rateRounded 
+} else {
+    $echo = 'frameRate = ' + $config.user.framerate
+}
+Write-Output $echo
+
+# user.ffmpegMode
+if ($config.user.ffmpegMode -ge $config.application.ffmpegPipeFormats.Length -or $config.user.ffmpegMode -lt 0){
+    $echo = 'ffmpegMode = ' + $config.user.ffmpegMode + ' (' + $config.application.ffmpegPipeFormats[$config.user.ffmpegMode][1] + ') (invalid, defaulting to mode 0 (' + $config.application.ffmpegPipeFormats[0][1] + '))'
+    $config.user.ffmpegMode = 0;
+} else {
+    $echo = 'ffmpegMode = ' + $config.user.ffmpegMode + ' (' + $config.application.ffmpegPipeFormats[$config.user.ffmpegMode][1] + ')'
+}
+Write-Output $echo
+
+# user.logFFmpeg
+if ((0..2).Contains($config.user.logFFmpeg)){
+    $echo = 'logFFmpeg = ' + $config.user.logFFmpeg
+} else {
+    $echo = 'logFFmpeg = ' + $config.user.logFFmpeg + ' (invalid, defaulting to 0)'
+    $config.user.logFFmpeg = 0
+}
+Write-Output $echo
+
+# user.logSession
+if ((0..2).Contains($config.user.logSession)){
+    $echo = 'logSession = ' + $config.user.logSession
+} else {
+    $echo = 'logSession = ' + $config.user.logSession + ' (invalid, defaulting to 1)'
+    $config.user.logSession = 1
+}
+Write-Output $echo
+
+# user.fontScale
+$q3e_renderScale = 0
+$q3e_fontScale = 1
+if ($config.user.renderScale.enabled){
+    $q3e_renderScale = $config.application.renderScaleMode
+    $q3e_fontScale = $config.user.fontScale.target * ($config.user.renderScale.resolution[1] / $config.user.fontScale.referenceResolution[1]) 
+
+    $q3e_fontScale = [Math]::Min([Math]::Max(0.5,$q3e_fontScale),8) # maximum range is 0.5 to 8
+
+     $echo = 'fontScale = ' + $config.user.fontScale.target + ' @ ' + $config.user.fontscale.referenceResolution + " (con_scale set to $q3e_fontScale)"
+}
+Write-Output $echo
+
+# user.exitBehaviour
+if ((0..3).Contains($config.user.exitBehaviour)){
+    $exitDesc = @('Exit w/o pause','Exit w/ pause','Logout','Shutdown')
+    $echo = 'exitBehaviour = ' + $config.user.exitBehaviour + ' (' + $exitDesc[$config.user.exitBehaviour] + ')'
+} else {
+    $echo = 'exitBehaviour = ' + $config.user.exitBehaviour + ' (invalid, defaulting to 1 (Exit w/ pause))'
+    $config.user.exitBehaviour = 1
+}
+Write-Output $echo
+
 if ( -not $(YNquery("Are those settings correct?"))) { exit }
 
 # === APPLICATION === 
@@ -65,8 +170,7 @@ if (Test-Path -PathType Leaf .\zz_render\session.json) {
 if ($config.user.mergeRender -and -not $continueSession){
         Remove-Item .\zz_render\temp\merge\*.mp4
 
-        $temp_date_formatted = $($session.date.start | Get-Date -UFormat "Demo list of render session %Y:%m:%d %H:%M:%S")
-        Write-Output $temp_date_formatted | Out-File -Encoding ascii .\zz_render\temp\output_mergelist.txt
+        $session.date.start | Get-Date -UFormat "Demo list of render session %Y-%m-%d %H:%M:%S" | Out-File -Encoding ascii .\zz_render\temp\output_mergelist.txt
         Write-Output "ffconcat version 1.0" | Out-File -Encoding ascii .\zz_render\temp\ffmpeg_mergelist.txt        
 }
 
@@ -131,6 +235,7 @@ $temp_firstdemo = $true
     Add-Member -Force -InputObject $temp_demo -MemberType NoteProperty -Name fileName_truncated -Value $(truncateFilename($file))
     Add-Member -Force -InputObject $temp_demo -MemberType NoteProperty -Name fileExtension -Value $file.Extension
     Add-Member -Force -InputObject $temp_demo -MemberType NoteProperty -Name renderFinished -Value $false
+    Add-Member -Force -InputObject $temp_demo -MemberType NoteProperty -Name stopAfterCurrent -Value $false
     
     if ($config.user.mergeRender) {
         Write-Output "file merge/$captureName.mp4" | Out-File -Append -Encoding ascii .\zz_render\temp\ffmpeg_mergelist.txt
@@ -154,19 +259,9 @@ Write-Output ' ' "=== Starting render ===" ' '
 $currentDuration = 0
 $env:FFREPORT = ''
 
-# render scaling stuff
-$q3e_renderScale = 0
-$q3e_fontScale = 1
-if ($config.user.renderScale.enabled){
-    $q3e_renderScale = $config.application.renderScaleMode
-    $q3e_fontScale = $config.user.fontScale.target * ($config.user.renderScale.resolution[1] / $config.user.fontScale.referenceResolution[1]) 
-
-    Write-Output "Console font scale set to $q3e_fontScale."
-}
-    
 
 :renderLoop foreach($demo in $session.demo){
-    
+   
     $captureName = $demo.captureName
     $demoName = $demo.fileName_truncated
     $game = $demo.game
@@ -181,6 +276,11 @@ if ($config.user.renderScale.enabled){
 	
     Write-Output "Rendering ""$demoName""... (capturename: $captureName)"
 
+    if($demo.stopAfterCurrent){
+        "Stopping rendering after the demo."
+    }
+
+
     Copy-Item ".\render_input\$fileName" ".\$game\demos\$captureName$fileExt"
 
 
@@ -193,24 +293,29 @@ if ($config.user.renderScale.enabled){
         $('+seta r_renderHeight ' + $config.user.renderScale.resolution[1]),
         $('+seta cl_aviPipeFormat ' + $config.application.ffmpegPipeFormats[$config.user.ffmpegMode][0]),
         $('+seta cl_aviFrameRate ' +  $config.user.framerate),
-        $('+seta con_scale ' + $q3e_fontScale),
+        "+seta con_scale  $q3e_fontScale",
         $('+demo ' + $demo.captureName + $demo.fileExtension),
         "+video-pipe $captureName"
     )
 
+    $demo_rstarttime = Get-Date
     $q3e_proc = Start-Process -PassThru -ArgumentList $q3e_args -FilePath .\quake3e.x64.exe
-    $temp_renderTime = Measure-Command {Wait-Process -InputObject $q3e_proc}
+    $demo_rtime = Measure-Command {Wait-Process -InputObject $q3e_proc}
 
     
-    Write-Output $(-join ("Time in minutes: ", $temp_renderTime.TotalMinutes)) ' '
+    Write-Output $(-join ("Time in minutes: ", $demo_rtime.TotalMinutes)) ' '
     
     $demo.renderFinished = $true
-    Add-Member -Force -InputObject $demo -MemberType NoteProperty -Name renderTime -Value $temp_renderTime  
+
+    $demo_rtime1 = New-Object -TypeName PSObject
+    Add-Member -Force -InputObject $demo_rtime1 -MemberType NoteProperty -Name start -Value $demo_rstarttime
+    Add-Member -Force -InputObject $demo_rtime1 -MemberType NoteProperty -Name duration -Value $demo_rtime  
+
+    Add-Member -Force -InputObject $demo -MemberType NoteProperty -Name renderTime -Value $demo_rtime1 
     Add-Member -Force -InputObject $demo -MemberType NoteProperty -Name ffmpegModeDesc -Value $config.application.ffmpegPipeFormats[$config.user.ffmpegMode][1]
 
     writeSession
-
-    
+   
     $file = Get-Item ".\$game\videos\$captureName.mp4"
     :lockFileLoop do { # wait until the rendered .mp4 is not locked anymore
         try {
@@ -267,6 +372,10 @@ if ($config.user.renderScale.enabled){
         }
     }    
     Remove-Item ".\$game\demos\$captureName$fileExt"
+
+    if($demo.stopAfterCurrent){
+        stopRender
+    }
 }
 
 
@@ -316,4 +425,4 @@ if ($config.user.logSession -eq 2){
 }
 Write-Output "Rendering finished."
 
-pause
+stopRender
