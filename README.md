@@ -68,7 +68,7 @@ Your Q3 folder
     - The console font will be scaled if renderScale is enabled. `target` is the target size at the resolution specified in `renderResolution`.
 -  `"exitBehaviour" : 1`
     - This setting controls what happens when the demo list reaches its end.
-    - There also is a way to trigger a stop after a specific demo has finished rendering. Set `stopAfterCurrent = true` for the demo inside the *session.json* file.
+    - It is also possible to trigger a stop after a specific demo has finished rendering. Set `stopAfterCurrent = true` for the demo inside the *session.json* file.
     - Possible settings are:
         - `0` - Exit without further pausing.
         - `1` - Pause, and then exit. This is the default (and old) behaviour.
