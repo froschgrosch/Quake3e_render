@@ -253,7 +253,6 @@ if (-not $continueSession) { # fresh session
     writeSession
 }
 
-pause
 
 Write-Output ' ' "=== Starting render ===" ' '
 # == Render Loop == 
