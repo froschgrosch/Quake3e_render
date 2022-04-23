@@ -1,5 +1,5 @@
 # Powershell application to aid in demo rendering.
-# https://github.com/froschgrosch/quake3-scripts
+# https://github.com/froschgrosch/Quake3e_render
 
 
 # === FUNCTION DECLARATIONS ===
