@@ -128,9 +128,9 @@ if ($config.user.renderScale.enabled){
 
     $q3e_fontScale = [Math]::Min([Math]::Max(0.5,$q3e_fontScale),8) # maximum range is 0.5 to 8
 
-     $echo = 'fontScale = ' + $config.user.fontScale.target + ' @ ' + $config.user.fontscale.referenceResolution + " (con_scale set to $q3e_fontScale)"
+    $echo = 'fontScale = ' + $config.user.fontScale.target + ' @ ' + $config.user.fontscale.referenceResolution + " (con_scale set to $q3e_fontScale)"
+    sWrite-Output $echo
 }
-Write-Output $echo
 
 # user.exitBehaviour
 if ((0..2).Contains($config.user.exitBehaviour)){
