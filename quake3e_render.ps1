@@ -359,7 +359,7 @@ $env:FFREPORT = ''
             Move-Item -Force ".\$game\videos\$captureName.mp4-log.txt" "$outputPath\$demoName.log"
         } elseif ( $config.user.logFFmpeg -eq 2){ # save with compression
             Rename-Item ".\$game\videos\$captureName.mp4-log.txt" "$demoName.log"
-            .\zz_tools\7za.exe a $(-join $(Resolve-Path $outputPath).Path + "\$demoName.log.gz") "$game\videos\$demoName.log" -mx=9 -sdel | Out-Null
+            .\zz_tools\7za.exe a $(-join $(Resolve-Path $outputPath).Path + "\$demoName.log.xz") "$game\videos\$demoName.log" -mx=9 -sdel | Out-Null
         } else { # delete ffmpeg logs
             Remove-Item ".\$game\videos\$captureName.mp4-log.txt"
         }
@@ -391,7 +391,7 @@ if ($config.user.mergeRender){
     # save the logs
     if ($config.user.logFFmpeg -eq 2) {
         .\zz_tools\7za.exe a zz_render\temp\merge_ffmpeglogs.tar ffmpeg_merge.log .\zz_render\temp\ffmpeg_mergelist.txt .\zz_render\temp\merge_ffmpeglogs\*.log -sdel
-        .\zz_tools\7za.exe a $(-join $(Resolve-Path $outputPath).Path + "\merge_ffmpeglogs.tar.gz") zz_render\temp\merge_ffmpeglogs.tar -mx=9 -sdel -y
+        .\zz_tools\7za.exe a $(-join $(Resolve-Path $outputPath).Path + "\merge_ffmpeglogs.tar.xz") zz_render\temp\merge_ffmpeglogs.tar -mx=9 -sdel -y
     } elseif ($config.user.logFFmpeg -eq 1) {
         Move-Item .\zz_render\temp\ffmpeg_mergelist.txt .\zz_render\temp\merge_ffmpeglogs\ffmpeg_mergelist.txt
         Move-Item .\ffmpeg_merge.log .\zz_render\temp\merge_ffmpeglogs\ffmpeg_merge.log
@@ -409,7 +409,7 @@ $temp_date_formatted = $($session.date.end | Get-Date -UFormat "%Y_%m_%d-%H_%M_%
 
 if ($config.user.logSession -eq 2){
     writeSession
-    .\zz_tools\7za.exe a "zz_render\logs\session-$temp_date_formatted.json.gz" ".\zz_render\session.json" -mx=9 -sdel | Out-Null
+    .\zz_tools\7za.exe a "zz_render\logs\session-$temp_date_formatted.json.xz" ".\zz_render\session.json" -mx=9 -sdel | Out-Null
 } elseif ($config.user.logSession -eq 1) {
     writeSession
     Move-Item ".\zz_render\session.json" ".\zz_render\logs\session-$temp_date_formatted.json"

@@ -63,7 +63,7 @@ Your Q3 folder
   - When set to 2, the logs will be compressed and moved to the output path.
 - `"logSession" : 0`
   - When set to 1, *session.json* will be moved to the *zz_render\logs\\* directory
-  - When set to 2, *session.json* will be compressed and moved to the *zz_render\logs\\* directory
+  - When set to 2, *session.json* will be compressed with the *xz* algorithm and moved to the *zz_render\logs\\* directory
 - `"fontScale" : { "target": 1, "referenceResolution" : [1920, 1080] }`
   - The console font will be scaled if renderScale is enabled. `target` is the target size at the resolution specified in `renderResolution`.
 - `"exitBehaviour" : 1`
