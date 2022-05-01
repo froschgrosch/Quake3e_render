@@ -409,13 +409,14 @@ $temp_date_formatted = $($session.date.end | Get-Date -UFormat "%Y_%m_%d-%H_%M_%
 
 if ($config.user.logSession -eq 2){
     writeSession
+    Move-Item '.\zz_render\session.json' ".\zz_render\session-$temp_date_formatted.json"
     .\zz_tools\7za.exe a "zz_render\logs\session-$temp_date_formatted.json.xz" ".\zz_render\session.json" -mx=9 -sdel | Out-Null
 } elseif ($config.user.logSession -eq 1) {
     writeSession
-    Move-Item ".\zz_render\session.json" ".\zz_render\logs\session-$temp_date_formatted.json"
+    Move-Item '.\zz_render\session.json' ".\zz_render\logs\session-$temp_date_formatted.json"
 } else {
-    Remove-Item ".\zz_render\session.json"
+    Remove-Item '.\zz_render\session.json'
 }
-Write-Output "Rendering finished."
+Write-Output 'Rendering finished.'
 
 stopRender
