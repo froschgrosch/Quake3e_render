@@ -93,3 +93,5 @@ Your Q3 folder
   - [Here is the section in the Quake3e docs](https://github.com/ec-/Quake3e/blob/master/docs/quake3e.htm#L218)
 - `"shutdownTimeout" : 30`
   - Specifies the shutdown timeout. This is how much time you will have from when you are notified that your computer is about to shut down until it actually does it.
+- `"confirmSession" : 0`
+  - If set to 1, the application will wait for confirmation before it starts rendering after creating the render list. Useful if you often edit *session.json* manually.

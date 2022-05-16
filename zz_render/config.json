@@ -19,6 +19,7 @@
             [ "\"-preset medium -crf 23 -vcodec libx264 -flags +cgop -pix_fmt yuv420 -bf 2 -codec:a aac -strict -2 -b:a 160k -r:a 22050 -movflags faststart\"", "x264 crf23 medium" ]
         ],
         "renderScaleMode" :  3,
-        "shutdownTimeout" : 30
+        "shutdownTimeout" : 30,
+        "confirmSession": 0
     }
 }

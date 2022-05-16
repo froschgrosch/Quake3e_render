@@ -246,6 +246,10 @@ if (-not $continueSession) { # fresh session
     writeSession
 }
 
+if ($config.application.confirmSession) {
+    Write-Output ' ' 'Confirm / edit session...'
+    pause
+}
 
 Write-Output ' ' "=== Starting render ===" ' '
 # == Render Loop == 
