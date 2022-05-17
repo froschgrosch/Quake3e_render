@@ -1,7 +1,6 @@
 # Powershell application to aid in demo rendering.
 # https://github.com/froschgrosch/Quake3e_render
 
-
 # === FUNCTION DECLARATIONS ===
 function truncateFilename($file) { # Remove the extension from the filename string 
     return $file.Name.Remove($file.Name.Length - $file.Extension.Length, $file.Extension.Length);
@@ -129,7 +128,7 @@ if ($config.user.renderScale.enabled){
     $q3e_fontScale = [Math]::Min([Math]::Max(0.5,$q3e_fontScale),8) # maximum range is 0.5 to 8
 
     $echo = 'fontScale = ' + $config.user.fontScale.target + ' @ ' + $config.user.fontscale.referenceResolution + " (con_scale set to $q3e_fontScale)"
-    sWrite-Output $echo
+    Write-Output $echo
 }
 
 # user.exitBehaviour
@@ -168,12 +167,12 @@ if ($config.user.mergeRender -and -not $continueSession){
 }
 
 # === Demo List Creation ===
-Write-Output ' ' "=== Creating render list ===" ' '
+Write-Output ' ' '=== Creating render list ===' ' '
 
 $temp_firstdemo = $true
 :createRenderList foreach($file in $(Get-ChildItem .\render_input\ | Sort-Object -Property LastWriteTime)){
     if ($continueSession) {
-        Write-Output "session.json found, skipping renderlist creation..."
+        Write-Output 'session.json found, skipping renderlist creation...'
         break
     } 
     
@@ -216,7 +215,7 @@ $temp_firstdemo = $true
 
     # demo is valid, ready for further processing
 
-    Write-Output "Adding to renderlist."
+    Write-Output 'Adding to renderlist.'
 
     $temp_demo = New-Object -TypeName PSObject
 
