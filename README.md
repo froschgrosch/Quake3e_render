@@ -74,6 +74,8 @@ Your Q3 folder
     - `1` - Pause, and then exit. This is the default (and old) behaviour.
     - `2` - Shut down the computer.
   - The timeout for the shutdown is specified in the `shutdownTimeout` setting.
+- `"demoSorting" : 1`
+  - If set to `1`, demos will be sorted by date for the render list creation. Otherwise, they are sorted by name.
 
 ## Application configuration
 

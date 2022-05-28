@@ -141,6 +141,15 @@ if ((0..2).Contains($config.user.exitBehaviour)){
 }
 Write-Output $echo
 
+# user.demoSorting
+if ((0..1).Contains($config.user.demoSorting)){
+    $echo = 'demoSorting = ' + $config.user.demoSorting
+} else {
+    $echo = 'demoSorting = ' + $config.user.demoSorting + ' (invalid, defaulting to 1 (sorting by date))'
+    $config.user.demoSorting = 1
+}
+Write-Output $echo
+
 if ( -not $(YNquery("Are those settings correct?"))) { exit }
 
 # === APPLICATION === 
@@ -170,7 +179,14 @@ if ($config.user.mergeRender -and -not $continueSession){
 Write-Output ' ' '=== Creating render list ===' ' '
 
 $temp_firstdemo = $true
-:createRenderList foreach($file in $(Get-ChildItem .\render_input\ | Sort-Object -Property LastWriteTime)){
+
+$files = Get-ChildItem .\render_input\
+
+if ($config.user.demoSorting) {
+    $files = $files | Sort-Object -Property -LastWriteTime
+}
+
+:createRenderList foreach($file in $files){
     if ($continueSession) {
         Write-Output 'session.json found, skipping renderlist creation...'
         break
