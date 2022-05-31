@@ -183,7 +183,7 @@ $temp_firstdemo = $true
 $files = Get-ChildItem .\render_input\
 
 if ($config.user.demoSorting) {
-    $files = $files | Sort-Object -Property -LastWriteTime
+    $files = $files | Sort-Object -Property LastWriteTime
 }
 
 :createRenderList foreach($file in $files){
