@@ -147,7 +147,7 @@ Write-Output $echo
 $q3e_renderScale = 0
 $q3e_fontScale = 1
 if ($config.user.renderScale.enabled){
-    $q3e_renderScale = $config.application.renderScaleMode
+    $q3e_renderScale = $config.user.renderScale.mode
     $q3e_fontScale = $config.user.fontScale.target * ($config.user.renderScale.resolution[1] / $config.user.fontScale.referenceResolution[1]) 
 
     $q3e_fontScale = [Math]::Min([Math]::Max(0.5,$q3e_fontScale),8) # maximum range is 0.5 to 8
@@ -186,17 +186,24 @@ if (Test-Path -PathType Leaf .\zz_render\session.json) {
     $continueSession = $true
 } else { 
     # Initialize new session
-    $session = New-Object -TypeName PSObject
     $temp_date = New-Object -TypeName PSObject
-
     Add-Member -InputObject $temp_date -MemberType NoteProperty -Name start -Value $(Get-Date)
-    Add-Member -InputObject $session -MemberType NoteProperty -Name date -Value $temp_date
+    
+    $stats = New-Object -TypeName PSObject
+    Add-Member -InputObject $stats -MemberType -SecondValue -Name date -Value $temp_date
+    Remove-Variable $temp_date
+
+    $session = New-Object -TypeName PSObject
+    Add-Member -InputObject $session -MemberType NoteProperty -Name stats -Value $stats
+    Add-Member -InputObject $session -MemberType NoteProperty -Name renderProfile $renderProfile.name
+    
+    Remove-Variable $stats
 }
 
 if ($config.user.mergeRender -and -not $continueSession){
     Remove-Item .\zz_render\temp\merge\*.mp4
 
-        $session.date.start | Get-Date -UFormat "Demo list of render session %Y-%m-%d %H:%M:%S" | Out-File -Encoding ascii .\zz_render\temp\output_mergelist.txt
+    $session.stats.date.start | Get-Date -UFormat "Demo list of render session %Y-%m-%d %H:%M:%S" | Out-File -Encoding ascii .\zz_render\temp\output_mergelist.txt
     Write-Output "ffconcat version 1.0" | Out-File -Encoding ascii .\zz_render\temp\ffmpeg_mergelist.txt        
 }
 
@@ -455,8 +462,10 @@ if ($config.user.mergeRender){
     Remove-Item .\zz_render\temp\merge\*.mp4
 }
 
-Add-Member -InputObject $session.date -MemberType NoteProperty -Name end -Value $(Get-Date)
-$temp_date_formatted = $($session.date.end | Get-Date -UFormat "%Y_%m_%d-%H_%M_%S")
+# Writing session stats
+#Add-Member -InputObject $
+Add-Member -InputObject $session.stats.date -MemberType NoteProperty -Name end -Value $(Get-Date)
+$temp_date_formatted = $($session.stats.date.end | Get-Date -UFormat "%Y_%m_%d-%H_%M_%S")
 
 if ($config.user.logSession -eq 2){
     Write-Session
