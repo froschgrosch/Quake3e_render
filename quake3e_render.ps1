@@ -25,7 +25,7 @@ function randomAlphanumeric($length){ # return a random alphanumeric string
 }
 
 function writeSession { # Saves the current session to a json file 
-    Write-Json '.\zz_render\session.json'
+    ConvertTo-Json -InputObject $session | Out-File .\zz_render\session.json
 }
 
 function stopRender { # exits if the demo's stopAfterCurrent is set to true or at the end of the render list.
@@ -50,14 +50,37 @@ function Write-Json ($inputObject, $outputPath){
     ConvertTo-Json -InputObject $inputObject | Out-File $outputPath
 }
 
+Write-Output '=== quake3e_render Powershell application ===' ' '
 
 # loading config
-$config = Read-Json '.\zz_render\config.json'
+$config = Get-Content .\zz_render\config.json | ConvertFrom-Json
 $outputPath = $config.application.outputPath
 
+# Override settings
+if($config.renderProfile -lt $config.renderProfiles.Length -and $config.renderProfile -gt -1){ 
+    $renderProfile = $config.renderProfiles[$config.renderProfile]
+    $renderProfileData = Read-Json $('.\zz_render\profiles\' + $renderProfile.configFile)
+    
+    $echo = 'Applying render profile "' + $renderProfile.profileName + '"'
+    Write-Output $echo
+
+    foreach ($override in $($config.user.PSObject.Properties | Select-Object -ExpandProperty Name)){
+        if ($override -in $renderProfileData.PSObject.Properties.Name){
+            Add-Member -Force -InputObject $config.user -MemberType NoteProperty -Name $override -Value $renderProfileData.$override
+        }
+    }
+
+    # check if the override q3config file actually exists.
+    if ($renderProfile.q3config_override -and -not $(Test-Path -PathType Leaf $('.\zz_render\profiles\' + $renderProfile.q3config_file))) {
+        $renderProfile.q3config_override = $false
+        
+        $echo = $renderProfile.q3config_file + ' does not exist! Config swapping is disabled for this session.'
+        Write-Output $echo
+    }
+} # don't override any settings otherwise
 
 # === SETTINGS CHECK ===
-Write-Output '=== quake3e_render Powershell application ===' ' ' 'Please check the application settings:' 
+Write-Output 'Please check the application settings:' 
 
 # user.mergeRender
 if (@(0,1).Contains($config.user.mergeRender)){
@@ -279,6 +302,11 @@ Write-Output ' ' "=== Starting render ===" ' '
 $currentDuration = 0
 $env:FFREPORT = ''
 
+# Swap config files if necessary
+if ($config.renderProfile -lt $config.renderProfiles.Length -and $config.renderProfile -gt -1 -and $renderProfile.q3config_override){   
+    Move-Item $('.\' + $renderProfile.fs_game + '\q3config.cfg') -Destination $('.\' + $renderProfile.fs_game + '\q3config.cfg.bak')
+    Copy-Item $('.\zz_render\profiles\' + $renderProfile.q3config_file) -Destination $('.\' + $renderProfile.fs_game + '\q3config.cfg')
+}
 
 :renderLoop foreach($demo in $session.demo){
    
@@ -398,6 +426,11 @@ $env:FFREPORT = ''
     }
 }
 
+# Put the original q3config back in place
+if ($config.renderProfile -lt $config.renderProfiles.Length -and $config.renderProfile -gt -1 -and $renderProfile.q3config_override){   
+    Remove-Item $('.\' + $renderProfile.fs_game + '\q3config.cfg')
+    Move-Item   $('.\' + $renderProfile.fs_game + '\q3config.cfg.bak') -Destination $('.\' + $renderProfile.fs_game + '\q3config.cfg')
+}
 
 # Merge with ffmpeg
 if ($config.user.mergeRender){
