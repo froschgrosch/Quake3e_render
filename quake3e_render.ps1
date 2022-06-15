@@ -190,14 +190,14 @@ if (Test-Path -PathType Leaf .\zz_render\session.json) {
     Add-Member -InputObject $temp_date -MemberType NoteProperty -Name start -Value $(Get-Date)
     
     $stats = New-Object -TypeName PSObject
-    Add-Member -InputObject $stats -MemberType -SecondValue -Name date -Value $temp_date
-    Remove-Variable $temp_date
+    Add-Member -InputObject $stats -MemberType NoteProperty -Name date -Value $temp_date
+    Remove-Variable 'temp_date'
 
     $session = New-Object -TypeName PSObject
     Add-Member -InputObject $session -MemberType NoteProperty -Name stats -Value $stats
     Add-Member -InputObject $session -MemberType NoteProperty -Name renderProfile $renderProfile.name
     
-    Remove-Variable $stats
+    Remove-Variable 'stats'
 }
 
 if ($config.user.mergeRender -and -not $continueSession){
@@ -267,7 +267,7 @@ if ($config.user.demoSorting) {
 
     $temp_demo = New-Object -TypeName PSObject
 
-    $captureName = return -join ((48..57) + (65..90) + (97..122) | Get-Random -Count $length | ForEach-Object {[char]$_});
+    $captureName =  -join $((48..57) + (65..90) + (97..122) | Get-Random -Count 11 | ForEach-Object {[char]$_});
 
     Add-Member -Force -InputObject $temp_demo -MemberType NoteProperty -Name captureName -Value $captureName
     Add-Member -Force -InputObject $temp_demo -MemberType NoteProperty -Name game -Value $temp_json.gameStates[0].configStringValues.fs_game
