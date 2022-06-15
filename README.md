@@ -129,8 +129,8 @@ The information regarding each render profile needs to be stored in `config.json
 `config.json` contains various information related to the render profile selection. The render profiles are stored in an array. It is also specified here if and how the config swapping should be dealt with. The following code example illustrates how a valid render profile specification looks.
 
 ``` JSON
-"renderProfile" : 0 // this selects the first one
-...
+"renderProfile" : 0, // this selects the first one
+// other stuff
 "renderProfiles" : [
     { 
         "profileName" : "preview_LQ (RA3)",
