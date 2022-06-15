@@ -130,10 +130,10 @@ The information regarding each render profile needs to be stored in `config.json
 
 ``` JSON
 "renderProfile" : 0, // this selects the first one
-// other stuff
+
 "renderProfiles" : [
     { 
-        "profileName" : "preview_LQ (RA3)",
+        "name" : "preview_LQ (RA3)",
         "configFile" : "preview_RA3_config.json",
         "q3config_override" : true,
         "q3config_file" : "preview_RA3_q3config.cfg",

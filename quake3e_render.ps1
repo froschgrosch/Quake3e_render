@@ -61,7 +61,7 @@ if($config.renderProfile -lt $config.renderProfiles.Length -and $config.renderPr
     $renderProfile = $config.renderProfiles[$config.renderProfile]
     $renderProfileData = Read-Json $('.\zz_render\profiles\' + $renderProfile.configFile)
     
-    $echo = 'Applying render profile "' + $renderProfile.profileName + '"'
+    $echo = 'Applying render profile "' + $renderProfile.name + '"'
     Write-Output $echo
 
     foreach ($override in $($config.user.PSObject.Properties | Select-Object -ExpandProperty Name)){
