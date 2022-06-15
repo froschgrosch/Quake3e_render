@@ -126,7 +126,7 @@ A config override file contains all the *user* settings that will be overridden.
 
 The information regarding each render profile needs to be stored in `config.json`. The render profile that is to be used will be selected with the `renderProfile` setting. The feature can also be disabled entirely by setting `renderProfile` to `-1`.
 
-`config.json` contains various information related to the render profile selection. The render profiles are stored in an array. It is also specified here if and how the config swapping should be dealt with. The following code example illustrates how a valid render profile specification looks.
+`config.json` contains various information related to the render profile selection. The render profiles are stored in an array. It is also specified here if and how the config swapping should be dealt with. The following code example illustrates how a valid render profile specification looks. *(Note that JSON doesn't actually support comments, they are just for clarification)*
 
 ``` JSON
 "renderProfile" : 0, // this selects the first one
