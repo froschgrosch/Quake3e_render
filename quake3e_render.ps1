@@ -58,16 +58,24 @@ $outputPath = $config.application.outputPath
 
 # Override settings
 if($config.renderProfile -lt $config.renderProfiles.Length -and $config.renderProfile -gt -1){ 
-    $overrideConfig = $config.renderProfiles[$config.renderProfile]
-    $overrideData = Read-Json $('.\zz_render\profiles\' + $overrideConfig.configFile)
+    $renderProfile = $config.renderProfiles[$config.renderProfile]
+    $renderProfileData = Read-Json $('.\zz_render\profiles\' + $renderProfile.configFile)
     
-    $echo = 'Applying render profile "' + $overrideConfig.profileName + '"'
+    $echo = 'Applying render profile "' + $renderProfile.profileName + '"'
     Write-Output $echo
 
     foreach ($override in $($config.user.PSObject.Properties | Select-Object -ExpandProperty Name)){
-        if ($override -in $overrideData.PSObject.Properties.Name){
-            Add-Member -Force -InputObject $config.user -MemberType NoteProperty -Name $override -Value $overrideData.$override
+        if ($override -in $renderProfileData.PSObject.Properties.Name){
+            Add-Member -Force -InputObject $config.user -MemberType NoteProperty -Name $override -Value $renderProfileData.$override
         }
+    }
+
+    # check if the override q3config file actually exists.
+    if ($renderProfile.q3config_override -and -not $(Test-Path -PathType Leaf $('.\zz_render\profiles\' + $renderProfile.q3config_file))) {
+        $renderProfile.q3config_override = $false
+        
+        $echo = $renderProfile.q3config_file + ' does not exist! Config swapping is disabled for this session.'
+        Write-Output $echo
     }
 } # don't override any settings otherwise
 
@@ -294,6 +302,11 @@ Write-Output ' ' "=== Starting render ===" ' '
 $currentDuration = 0
 $env:FFREPORT = ''
 
+# Swap config files if necessary
+if ($config.renderProfile -lt $config.renderProfiles.Length -and $config.renderProfile -gt -1 -and $renderProfile.q3config_override){   
+    Move-Item $('.\' + $renderProfile.fs_game + '\q3config.cfg') -Destination $('.\' + $renderProfile.fs_game + '\q3config.cfg.bak')
+    Copy-Item $('.\zz_render\profiles\' + $renderProfile.q3config_file) -Destination $('.\' + $renderProfile.fs_game + '\q3config.cfg')
+}
 
 :renderLoop foreach($demo in $session.demo){
    
@@ -413,6 +426,11 @@ $env:FFREPORT = ''
     }
 }
 
+# Put the original q3config back in place
+if ($config.renderProfile -lt $config.renderProfiles.Length -and $config.renderProfile -gt -1 -and $renderProfile.q3config_override){   
+    Remove-Item $('.\' + $renderProfile.fs_game + '\q3config.cfg')
+    Move-Item   $('.\' + $renderProfile.fs_game + '\q3config.cfg.bak') -Destination $('.\' + $renderProfile.fs_game + '\q3config.cfg')
+}
 
 # Merge with ffmpeg
 if ($config.user.mergeRender){

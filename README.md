@@ -105,7 +105,9 @@ Your Q3 folder
 
 ## Render profiles
 
-The application now supports different rendering profiles, with the idea being to have different config files for different use cases (eg. one for rendering low quality previews, one for 4k etc.) which can have custom `q3config.cfg` files for each profiles.
+The application now supports different rendering profiles, with the idea being to have different config files for different use cases (eg. one for rendering low quality previews, one for 4k etc.) which can have custom `q3config.cfg` files for each profile.
+
+Please note that only one render profile (notably for one mod only) can be used in one session. So if you have demos for multiple mods only the one with the mod in the render profile will be using the render profile, as it only applies to one mod (This may change in the future though).
 
 A config override file contains all the *user* settings that will be overridden. Settings not included will stay at the default value specified in the config file as before. One such override file might look like this.
 
@@ -124,14 +126,14 @@ A config override file contains all the *user* settings that will be overridden.
 
 The information regarding each render profile needs to be stored in `config.json`. The render profile that is to be used will be selected with the `renderProfile` setting. The feature can also be disabled entirely by setting `renderProfile` to `-1`.
 
-`config.json` contains various information related to the render profile selection. The render profiles are stored in an array. The following code example illustrates how a valid render profile specification looks.
+`config.json` contains various information related to the render profile selection. The render profiles are stored in an array. It is also specified here if and how the config swapping should be dealt with. The following code example illustrates how a valid render profile specification looks.
 
 ``` JSON
 "renderProfile" : 0 // this selects the first one
 ...
 "renderProfiles" : [
     { 
-        "profileName" : "preview_LQ",
+        "profileName" : "preview_LQ (RA3)",
         "configFile" : "preview_RA3_config.json",
         "q3config_override" : true,
         "q3config_file" : "preview_RA3_q3config.cfg",
