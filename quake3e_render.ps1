@@ -2,7 +2,7 @@
 # https://github.com/froschgrosch/Quake3e_render
 
 # === FUNCTION DECLARATIONS ===
-function truncateFilename($file) { # Remove the extension from the filename string 
+function Remove-FileExtension($file) { # Remove the extension from the filename string 
     return $file.Name.Remove($file.Name.Length - $file.Extension.Length, $file.Extension.Length);
 }
 
@@ -18,17 +18,11 @@ function YNquery($prompt){ # Do a yes/no query and return $true/$false
     }
 }
 
-function randomAlphanumeric($length){ # return a random alphanumeric string 
-    # Characters:
-    # ABCDEFGHIJKLMNOPQRSTUVWYXZabcdefghijklmnopqrstuvwxyz0123456789
-    return -join ((48..57) + (65..90) + (97..122) | Get-Random -Count $length | ForEach-Object {[char]$_});
-}
-
-function writeSession { # Saves the current session to a json file 
+function Write-Session { # Saves the current session to a json file 
     ConvertTo-Json -InputObject $session | Out-File .\zz_render\session.json
 }
 
-function stopRender { # exits if the demo's stopAfterCurrent is set to true or at the end of the render list.
+function Stop-Render { # exits if the demo's stopAfterCurrent is set to true or at the end of the render list.
     if ($config.user.exitBehaviour -eq 0) { # exit w/o pause
         exit 0
     } elseif ($config.user.exitBehaviour -eq 1) { # exit w/ pause
@@ -188,7 +182,7 @@ if ( -not $(YNquery("Are those settings correct?"))) { exit }
 $continueSession = $false
 # Try to read existing session
 if (Test-Path -PathType Leaf .\zz_render\session.json) {
-    $session = Get-Content .\zz_render\session.json |  ConvertFrom-Json
+    $session = Read-Json '.\zz_render\session.json'
     $continueSession = $true
 } else { 
     # Initialize new session
@@ -200,10 +194,10 @@ if (Test-Path -PathType Leaf .\zz_render\session.json) {
 }
 
 if ($config.user.mergeRender -and -not $continueSession){
-        Remove-Item .\zz_render\temp\merge\*.mp4
+    Remove-Item .\zz_render\temp\merge\*.mp4
 
         $session.date.start | Get-Date -UFormat "Demo list of render session %Y-%m-%d %H:%M:%S" | Out-File -Encoding ascii .\zz_render\temp\output_mergelist.txt
-        Write-Output "ffconcat version 1.0" | Out-File -Encoding ascii .\zz_render\temp\ffmpeg_mergelist.txt        
+    Write-Output "ffconcat version 1.0" | Out-File -Encoding ascii .\zz_render\temp\ffmpeg_mergelist.txt        
 }
 
 # === Demo List Creation ===
@@ -231,7 +225,7 @@ if ($config.user.demoSorting) {
         continue createRenderList
     }
 
-    $temp_demoName = truncateFilename($file)
+    $temp_demoName = Remove-FileExtension($file)
 
     # Check for skipKeywords
     foreach ($j in $config.application.skipKeywords){
@@ -266,12 +260,12 @@ if ($config.user.demoSorting) {
 
     $temp_demo = New-Object -TypeName PSObject
 
-    $captureName = randomAlphanumeric(11)
+    $captureName = return -join ((48..57) + (65..90) + (97..122) | Get-Random -Count $length | ForEach-Object {[char]$_});
 
     Add-Member -Force -InputObject $temp_demo -MemberType NoteProperty -Name captureName -Value $captureName
     Add-Member -Force -InputObject $temp_demo -MemberType NoteProperty -Name game -Value $temp_json.gameStates[0].configStringValues.fs_game
     Add-Member -Force -InputObject $temp_demo -MemberType NoteProperty -Name fileName -Value $file.Name
-    Add-Member -Force -InputObject $temp_demo -MemberType NoteProperty -Name fileName_truncated -Value $(truncateFilename($file))
+    Add-Member -Force -InputObject $temp_demo -MemberType NoteProperty -Name fileName_truncated -Value $(Remove-FileExtension($file))
     Add-Member -Force -InputObject $temp_demo -MemberType NoteProperty -Name fileExtension -Value $file.Extension
     Add-Member -Force -InputObject $temp_demo -MemberType NoteProperty -Name renderFinished -Value $false
     Add-Member -Force -InputObject $temp_demo -MemberType NoteProperty -Name stopAfterCurrent -Value $false
@@ -289,7 +283,7 @@ if ($config.user.demoSorting) {
 }
  
 if (-not $continueSession) { # fresh session
-    writeSession
+    Write-Session
 }
 
 if ($config.application.confirmSession) {
@@ -328,9 +322,7 @@ if ($config.renderProfile -lt $config.renderProfiles.Length -and $config.renderP
         "Stopping rendering after the demo."
     }
 
-
     Copy-Item ".\render_input\$fileName" ".\$game\demos\$captureName$fileExt"
-
 
     $q3e_args = @(
         "+set fs_game $game",
@@ -350,7 +342,6 @@ if ($config.renderProfile -lt $config.renderProfiles.Length -and $config.renderP
     $q3e_proc = Start-Process -PassThru -ArgumentList $q3e_args -FilePath .\quake3e.x64.exe
     $demo_rtime = Measure-Command {Wait-Process -InputObject $q3e_proc}
 
-    
     Write-Output $(-join ("Time in minutes: ", $demo_rtime.TotalMinutes)) ' '
     
     $demo.renderFinished = $true
@@ -362,7 +353,7 @@ if ($config.renderProfile -lt $config.renderProfiles.Length -and $config.renderP
     Add-Member -Force -InputObject $demo -MemberType NoteProperty -Name renderTime -Value $demo_rtime1 
     Add-Member -Force -InputObject $demo -MemberType NoteProperty -Name ffmpegModeDesc -Value $config.application.ffmpegPipeFormats[$config.user.ffmpegMode][1]
 
-    writeSession
+    Write-Session
    
     $file = Get-Item ".\$game\videos\$captureName.mp4"
     :lockFileLoop do { # wait until the rendered .mp4 is not locked anymore
@@ -422,7 +413,7 @@ if ($config.renderProfile -lt $config.renderProfiles.Length -and $config.renderP
     Remove-Item ".\$game\demos\$captureName$fileExt"
 
     if($demo.stopAfterCurrent -and -not $config.user.mergeRender){
-        stopRender
+        Stop-Render
     }
 }
 
@@ -468,15 +459,15 @@ Add-Member -InputObject $session.date -MemberType NoteProperty -Name end -Value 
 $temp_date_formatted = $($session.date.end | Get-Date -UFormat "%Y_%m_%d-%H_%M_%S")
 
 if ($config.user.logSession -eq 2){
-    writeSession
+    Write-Session
     Move-Item '.\zz_render\session.json' ".\zz_render\session-$temp_date_formatted.json"
     .\zz_tools\7za.exe a "zz_render\logs\session-$temp_date_formatted.json.xz" ".\zz_render\session.json" -mx=9 -sdel | Out-Null
 } elseif ($config.user.logSession -eq 1) {
-    writeSession
+    Write-Session
     Move-Item '.\zz_render\session.json' ".\zz_render\logs\session-$temp_date_formatted.json"
 } else {
     Remove-Item '.\zz_render\session.json'
 }
 Write-Output 'Rendering finished.'
 
-stopRender
+Stop-Render
