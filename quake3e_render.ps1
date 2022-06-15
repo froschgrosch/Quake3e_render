@@ -25,7 +25,7 @@ function randomAlphanumeric($length){ # return a random alphanumeric string
 }
 
 function writeSession { # Saves the current session to a json file 
-    ConvertTo-Json -InputObject $session | Out-File .\zz_render\session.json
+    Write-Json '.\zz_render\session.json'
 }
 
 function stopRender { # exits if the demo's stopAfterCurrent is set to true or at the end of the render list.
@@ -42,9 +42,17 @@ function stopRender { # exits if the demo's stopAfterCurrent is set to true or a
     } 
 }
 
+function Read-Json ($inputPath) {
+    return Get-Content $inputPath | ConvertFrom-Json
+}
+
+function Write-Json ($inputObject, $outputPath){
+    ConvertTo-Json -InputObject $inputObject | Out-File $outputPath
+}
+
 
 # loading config
-$config = Get-Content .\zz_render\config.json | ConvertFrom-Json
+$config = Read-Json '.\zz_render\config.json'
 $outputPath = $config.application.outputPath
 
 
