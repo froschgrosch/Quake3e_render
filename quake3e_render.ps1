@@ -42,8 +42,6 @@ function stopRender { # exits if the demo's stopAfterCurrent is set to true or a
     } 
 }
 
-<<<<<<< Updated upstream
-=======
 function Read-Json ($inputPath) {
     return Get-Content $inputPath | ConvertFrom-Json
 }
@@ -53,7 +51,6 @@ function Write-Json ($inputObject, $outputPath){
 }
 
 Write-Output '=== quake3e_render Powershell application ===' ' '
->>>>>>> Stashed changes
 
 # loading config
 $config = Get-Content .\zz_render\config.json | ConvertFrom-Json
