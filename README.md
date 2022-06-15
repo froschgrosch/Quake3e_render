@@ -33,8 +33,13 @@ Your Q3 folder
 |   |---config.json
 |   |---logs/
 |   |---temp/
-|       |---merge/
-|       |---merge_ffmpeglogs/
+|   |   |---merge/
+|   |   |---merge_ffmpeglogs/
+|   |---profiles/
+|       | Custom profile files, eg.
+|       |---preview_RA3.json
+|       |---preview_RA3_q3config.cfg
+|         ...
 |
 |---zz_tools/
 |   |---UDT_json.exe
@@ -97,3 +102,40 @@ Your Q3 folder
   - Specifies the shutdown timeout. This is how much time you will have from when you are notified that your computer is about to shut down until it actually does it.
 - `"confirmSession" : 0`
   - If set to 1, the application will wait for confirmation before it starts rendering after creating the render list. Useful if you often edit *session.json* manually.
+
+## Render profiles
+
+The application now supports different rendering profiles, with the idea being to have different config files for different use cases (eg. one for rendering low quality previews, one for 4k etc.) which can have custom `q3config.cfg` files for each profiles.
+
+A config override file contains all the *user* settings that will be overridden. Settings not included will stay at the default value specified in the config file as before. One such override file might look like this.
+
+### preview_RA3.json
+
+``` JSON
+{
+    "mergeRender" : 0,
+    "renderScale" : { "enabled": 1, "resolution" : [960, 540] },
+    "framerate": 30,
+    "ffmpegMode" : 0,
+    "fontScale" : { "target": 2, "referenceResolution" : [1920, 1080] },
+    "demoSorting": 0
+}
+```
+
+The information regarding each render profile needs to be stored in `config.json`. The render profile that is to be used will be selected with the `renderProfile` setting. The feature can also be disabled entirely by setting `renderProfile` to `-1`.
+
+`config.json` contains various information related to the render profile selection. The render profiles are stored in an array. The following code example illustrates how a valid render profile specification looks.
+
+``` JSON
+"renderProfile" : 0 // this selects the first one
+...
+"renderProfiles" : [
+    { 
+        "profileName" : "preview_LQ",
+        "configFile" : "preview_RA3_config.json",
+        "q3config_override" : true,
+        "q3config_file" : "preview_RA3_q3config.cfg",
+        "game" : "arena"
+    }
+]
+```

@@ -1,4 +1,5 @@
 {
+    "renderProfile" : -1,
     "user" : {
         "mergeRender" : 0,
         "renderScale" : { "enabled": 0, "resolution" : [3840, 2160] },
@@ -22,5 +23,8 @@
         "renderScaleMode" :  3,
         "shutdownTimeout" : 30,
         "confirmSession": 0
-    }
+    },
+    "renderProfiles": [ 
+
+    ]
 }

@@ -25,7 +25,7 @@ function randomAlphanumeric($length){ # return a random alphanumeric string
 }
 
 function writeSession { # Saves the current session to a json file 
-    Write-Json '.\zz_render\session.json'
+    ConvertTo-Json -InputObject $session | Out-File .\zz_render\session.json
 }
 
 function stopRender { # exits if the demo's stopAfterCurrent is set to true or at the end of the render list.
@@ -42,6 +42,8 @@ function stopRender { # exits if the demo's stopAfterCurrent is set to true or a
     } 
 }
 
+<<<<<<< Updated upstream
+=======
 function Read-Json ($inputPath) {
     return Get-Content $inputPath | ConvertFrom-Json
 }
@@ -50,14 +52,30 @@ function Write-Json ($inputObject, $outputPath){
     ConvertTo-Json -InputObject $inputObject | Out-File $outputPath
 }
 
+Write-Output '=== quake3e_render Powershell application ===' ' '
+>>>>>>> Stashed changes
 
 # loading config
-$config = Read-Json '.\zz_render\config.json'
+$config = Get-Content .\zz_render\config.json | ConvertFrom-Json
 $outputPath = $config.application.outputPath
 
+# Override settings
+if($config.renderProfile -lt $config.renderProfiles.Length -and $config.renderProfile -gt -1){ 
+    $overrideConfig = $config.renderProfiles[$config.renderProfile]
+    $overrideData = Read-Json $('.\zz_render\profiles\' + $overrideConfig.configFile)
+    
+    $echo = 'Applying render profile "' + $overrideConfig.profileName + '"'
+    Write-Output $echo
+
+    foreach ($override in $($config.user.PSObject.Properties | Select-Object -ExpandProperty Name)){
+        if ($override -in $overrideData.PSObject.Properties.Name){
+            Add-Member -Force -InputObject $config.user -MemberType NoteProperty -Name $override -Value $overrideData.$override
+        }
+    }
+} # don't override any settings otherwise
 
 # === SETTINGS CHECK ===
-Write-Output '=== quake3e_render Powershell application ===' ' ' 'Please check the application settings:' 
+Write-Output 'Please check the application settings:' 
 
 # user.mergeRender
 if (@(0,1).Contains($config.user.mergeRender)){
