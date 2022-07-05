@@ -304,7 +304,7 @@ $currentDuration = 0
 $env:FFREPORT = ''
 
 # Swap config files if necessary
-if ($config.renderProfile -lt $config.renderProfiles.Length -and $config.renderProfile -gt -1 -and $renderProfile.q3config_override){   
+if ($config.renderProfile -lt $config.renderProfiles.Length -and $config.renderProfile -gt -1 -and $renderProfile.q3config_override -and -not $continueSession){   
     Move-Item $('.\' + $renderProfile.fs_game + '\q3config.cfg') -Destination $('.\' + $renderProfile.fs_game + '\q3config.cfg.bak')
     Copy-Item $('.\zz_render\profiles\' + $renderProfile.q3config_file) -Destination $('.\' + $renderProfile.fs_game + '\q3config.cfg')
 }
