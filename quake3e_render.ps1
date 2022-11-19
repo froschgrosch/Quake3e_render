@@ -289,6 +289,12 @@ if ($config.user.demoSorting) {
     }
 }
  
+if($session.demo.Length -eq 0){
+    Write-Output ' ' 'No valid demos in the input folder. Confirm to exit.'
+    pause
+    exit
+}
+
 if (-not $continueSession) { # fresh session
     Write-Session
 }

@@ -73,7 +73,7 @@ Your Q3 folder
   - The console font will be scaled if renderScale is enabled. `target` is the target size at the resolution specified in `renderResolution`.
 - `"exitBehaviour" : 1`
   - This setting controls what happens when the demo list reaches its end.
-  - It is also possible to trigger a stop after a specific demo has finished rendering. Set `stopAfterCurrent = true` for the demo inside the *session.json* file.
+  - It is also possible to trigger a stop after a specific demo has finished rendering. Set `"stopAfterCurrent": true` for the demo inside the *session.json* file.
   - Possible settings are:
     - `0` - Exit without further pausing.
     - `1` - Pause, and then exit. This is the default (and old) behaviour.
@@ -107,7 +107,7 @@ Your Q3 folder
 
 The application now supports different rendering profiles, with the idea being to have different config files for different use cases (eg. one for rendering low quality previews, one for 4k etc.) which can have custom `q3config.cfg` files for each profile.
 
-Please note that only one render profile (notably for one mod only) can be used in one session. So if you have demos for multiple mods only the one with the mod in the render profile will be using the render profile, as it only applies to one mod.
+Please bear in mind that only one render profile (notably for one mod only) can be used in one session. So if you have demos for multiple mods, only the one with the mod in the render profile will be using the custom settings of the render profile, as it only applies to one mod.
 
 A config override file contains all the *user* settings that will be overridden. Settings not included will stay at the default value specified in the config file as before. One such override file might look like this.
 
