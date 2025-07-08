@@ -18,6 +18,16 @@ function Add-NewProperty ($inputObject, $name){
     Add-ToObject $inputObject -name $name -value (New-Object -TypeName 'PSObject')
 }
 
-function Show-DemoList ($list) {
-    $list | Select-Object -Property '*' -ExcludeProperty @('transcoded','stopAfterCurrent') | Format-Table
+function Show-DemoList {
+    Param (
+        [Parameter(Mandatory=$true)] $list,
+        [Parameter(Mandatory=$false)] $ExcludeProperty = $null
+    ) 
+    
+    if ($null -ne $ExcludeProperty) {
+        $list | Select-Object -Property '*' -ExcludeProperty $ExcludeProperty | Format-Table
+    }
+    else {
+        $list | Format-Table
+    }
 }
