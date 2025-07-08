@@ -5,6 +5,13 @@ $config = Read-Json .\zz_config\prepare.json
 $demoList = @()
 
 $inputFiles = Get-ChildItem  .\zz_transcode\input | Where-Object -Property Extension -EQ '.dm_68'
+
+if ($null -eq $inputFiles) {
+    Write-Output 'ERROR: No valid input files found!' 'Please check .\zz_transcode\input\'
+    pause
+    exit
+}
+
 :preparationLoop foreach ($file in $inputFiles) {
     Write-Output "Checking $($file.name)..."
     
