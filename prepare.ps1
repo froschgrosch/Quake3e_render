@@ -1,6 +1,21 @@
 . .\functions.ps1
 $config = Read-Json .\zz_config\prepare.json
 
+# check if a list was already created
+if (Test-Path -PathType Leaf -Path '.\zz_transcode\demoList.json'){
+    $demoList = Read-Json .\zz_transcode\demoList.json
+
+    Write-Output 'The following demo list was already created earlier.'
+    Show-DemoList $demoList
+
+    if(Get-UserConfirmation 'Do you want to create a new one?'){
+        Remove-Item .\zz_transcode\demoList.json
+    }
+    else {
+        exit
+    }
+}
+
 # create empty array
 $demoList = @()
 
@@ -44,7 +59,6 @@ if ($null -eq $inputFiles) {
     Add-ToObject $demoObject 'name'     $file.Name
     Add-ToObject $demoObject 'tempName' $(-join $((48..57) + (65..90) + (97..122) | Get-Random -Count 11 | ForEach-Object {[char]$_}))
     Add-ToObject $demoObject 'fs_game'  $fs_game
-
 
     # add demo to list
     $demoList += $demoObject
