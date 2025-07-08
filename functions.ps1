@@ -17,3 +17,7 @@ function Add-ToObject ($inputObject, $name, $value) {
 function Add-NewProperty ($inputObject, $name){
     Add-ToObject $inputObject -name $name -value (New-Object -TypeName 'PSObject')
 }
+
+function Show-DemoList ($list) {
+    $list | Select-Object -Property '*' -ExcludeProperty @('transcoded','stopAfterCurrent') | Format-Table
+}

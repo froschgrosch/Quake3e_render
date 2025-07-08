@@ -53,5 +53,5 @@ if ($null -eq $inputFiles) {
 $demoList | ConvertTo-Json | Out-File .\zz_transcode\demoList.json
 
 Write-Output 'Demo preprocessing is finished.' 'Please check the final output:'
-$demoList | Select-Object -Property '*' -ExcludeProperty @('transcoded','stopAfterCurrent') | Format-Table
+Show-DemoList $demoList
 pause
