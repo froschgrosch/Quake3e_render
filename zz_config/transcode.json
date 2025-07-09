@@ -1,0 +1,12 @@
+{
+    "configSwapping": {
+        "enabled": true,
+        "allowedGames": ["arena","osp"],
+        "list": [
+            ["00_preview","arena"],
+            ["01_ra3newbs2","arena"],
+            ["02_ra3newbs3","arena"],
+            ["00_q3msk_4K","osp"]            
+        ]
+    }
+}
