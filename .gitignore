@@ -1,0 +1,14 @@
+# mods
+baseq3/
+arena/
+osp/
+
+# other folders
+transcode/
+zz_transcode/
+zz_tools/
+
+# files
+ffmpeg.exe
+quake3e.x64.exe
+pk3cache.dat
