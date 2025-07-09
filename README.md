@@ -24,13 +24,18 @@ Your Q3 folder
 |---baseq3/
 |   ... other mod folders
 |
-|---transcode/
+|---zz_transcode/
 |   |
 |   |---input/
 |   |---output/
+|   |---demoList.json
 |
 |---zz_tools/
 |   |---UDT_json.exe
+|
+|---zz_config/
+|   |
+|   |---prepare.json
 |
 |---ffmpeg.exe
 |
