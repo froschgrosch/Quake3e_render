@@ -23,10 +23,9 @@ if (-not (Get-UserConfirmation 'Do you want to continue?')){
         Write-Output "Skipping $cleanName... (was already transcoded earlier)"
         continue :transcodingLoop
     }
+    Write-Output "Now transcoding $cleanName..."
 
-    $udtoutput = $(.\zz_tools\UDT_json.exe -a=g -c "..\zz_transcode\input\$($demo.Name)" | ConvertFrom-Json).gamestates[0]
-    $fs_game = $udtoutput.configStringValues.fs_game
-    
+    $fs_game = $demo.fs_game
     $tempName = $demo.tempName
     # swap config if applicable (to be implemented)
 
@@ -40,7 +39,6 @@ if (-not (Get-UserConfirmation 'Do you want to continue?')){
         "+video-pipe $tempName"
     )
     
-    Write-Output "Now transcoding $cleanName..."
     Start-Process -Wait -ArgumentList $q3e_args -FilePath .\quake3e.x64.exe
     
     Remove-Item ".\$fs_game\demos\$tempName.dm_68"
