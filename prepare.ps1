@@ -42,7 +42,7 @@ if ($null -eq $inputFiles) {
     # check if fs_game is valid
     $udtoutput = $(.\zz_tools\UDT_json.exe -a=g -c "..\zz_transcode\input\$file" | ConvertFrom-Json).gamestates[0]
     $fs_game = $udtoutput.configStringValues.fs_game
-    if (-not $config.allowedGames.Contains($fs_game)) {
+    if (-not $config.games.allowed.Contains($fs_game)) {
         Write-Output """$fs_game"" is not a valid game!" ' '
         continue :demoLoop
     }
@@ -54,6 +54,7 @@ if ($null -eq $inputFiles) {
     #static values
     Add-ToObject $demoObject 'transcoded' $false
     Add-ToObject $demoObject 'stopAfterCurrent' $false
+    Add-ToObject $demoObject 'renderConfig' $config.games.defaultConfig.$fs_game
 
     #dynamic values
     Add-ToObject $demoObject 'name'     $file.Name

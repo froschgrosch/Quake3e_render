@@ -1,3 +1,9 @@
 {
-    "allowedGames": ["arena","osp"]
+    "games": {
+        "allowed": ["arena","osp"],
+        "defaultConfig": {
+            "arena": -1,
+            "osp": -1
+        }
+    }
 }
