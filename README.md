@@ -28,6 +28,7 @@ Your Q3 folder
 |   |
 |   |---input/
 |   |---output/
+|   |---currentConfigFiles.json // only if feature is enabled
 |   |---demoList.json
 |
 |---zz_tools/
@@ -36,6 +37,18 @@ Your Q3 folder
 |---zz_config/
 |   |
 |   |---prepare.json
+|   |---transcode.json
+|   |---q3cfg/
+|       |
+|       |---arena/
+|       |   |
+|       |   |---00_preview.cfg
+|       |       ... other config files
+|       |
+|       |---osp/
+|           |
+|           |---00_q3msk_4K.cfg
+|       ...and so on
 |
 |---ffmpeg.exe
 |
