@@ -54,3 +54,14 @@ Your Q3 folder
 |
 |---quake3e.x64.exe
 ```
+## transcode.ps1
+
+The following settings can be configured in `transcode.json` (list is not yet complete).
+
+### exitBehaviour.value
+
+| value | Result                                                                                                                             |
+|-------|------------------------------------------------------------------------------------------------------------------------------------|
+| 0     | Exit with pausing (to make the console log readable)                                                                               |
+| 1     | Exit without pausing                                                                                                               |
+| 2     | Shut down the machine after the timeout specified in `exitBehaviour.shutdownTimeout`. The shutdown can be interrupted by the user. |

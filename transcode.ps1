@@ -1,3 +1,4 @@
+## FUNCTION DECLARATION ##
 . .\functions.ps1
 
 function Set-ConfigFile ($i, $gamename) {
@@ -26,6 +27,31 @@ function Set-ConfigFile ($i, $gamename) {
         $currentConfigFiles.$gamename = $i
     }
 }
+
+function Exit-TranscodeSession { # exits if the demo's stopAfterCurrent is set to true or at the end of the render list.
+    Switch ($config.exitBehaviour.value){
+        0 { # exit with pause
+            Pause
+            exit 0
+        }
+        1 { # exit without pause
+            exit 0
+        }
+        2 { # shutdown with timeout
+            Write-Output $message
+            shutdown -s -t ($config.exitBehaviour.shutdownTimeout) -c "Shutting down in $($config.exitBehaviour.shutdownTimeout) seconds."
+
+            if (Get-UserConfirmation 'Cancel shutdown?') {
+                shutdown -a
+            }
+            Write-Output 'Shutdown cancelled.'
+            Pause
+            exit
+        }
+    }
+}
+
+## PROGRAM START ##
 
 # check if a list was already created
 if (-not (Test-Path -PathType Leaf -Path '.\zz_transcode\demoList.json')){
@@ -98,9 +124,10 @@ if ($config.configSwapping.enabled) {
 
     # mark demo as finished
     $demoList | ConvertTo-Json | Out-File .\zz_transcode\demoList.json
+
     if ($demo.stopAfterCurrent){
-        # todo: implement other options (shutdown etc.)
-        exit
+        Write-Output ' ' 'Demo transcoding is being paused.' 'You can resume by invoking ".\transcode.ps1" again.'
+        Exit-TranscodeSession
     }
 }
 
@@ -117,4 +144,4 @@ if ($config.configSwapping.enabled) {
 
 Remove-Item .\zz_transcode\demoList.json
 Write-Output ' ' 'Demo transcoding is finished.'
-pause
+Exit-TranscodeSession

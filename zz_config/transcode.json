@@ -8,5 +8,9 @@
             ["02_ra3newbs3","arena"],
             ["00_q3msk_4K","osp"]            
         ]
+    },
+    "exitBehaviour": {
+        "value": 0,
+        "shutdownTimeout": 60
     }
 }
