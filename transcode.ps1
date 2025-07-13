@@ -43,9 +43,9 @@ function Exit-TranscodeSession { # exits if the demo's stopAfterCurrent is set t
 
             if (Get-UserConfirmation 'Cancel shutdown?') {
                 shutdown -a
+                Write-Output 'Shutdown cancelled.'
+                Pause
             }
-            Write-Output 'Shutdown cancelled.'
-            Pause
             exit
         }
     }
