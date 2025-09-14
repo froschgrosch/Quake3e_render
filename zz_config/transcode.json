@@ -13,5 +13,6 @@
         "value": 0,
         "shutdownTimeout": 60
     },
-    "ffmpegPriority":"Idle"
+    "ffmpegPriority": "Idle",
+    "hideQ3window": true
 }

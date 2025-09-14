@@ -69,3 +69,7 @@ The following settings can be configured in `transcode.json` (list is not yet co
 ### ffmpegPriority
 
 Defines the process priority that the ffmpeg and Quake3e processes will use. Allowed values are `Idle` (low), `Normal` and `High`.
+
+### hideQ3window
+
+When set to `true`, the Quake3e window will be minimized. The cmd window which houses the ffmpeg process will still show up for now.

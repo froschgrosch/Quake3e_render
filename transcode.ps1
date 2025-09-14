@@ -130,6 +130,10 @@ if ($config.configSwapping.enabled) {
         "+demo $tempName"
         "+video-pipe $tempName"
     )
+
+    if ($config.hideQ3window) {
+        $q3e_args += '+minimize'
+    }
     
     $q3e_proc = Start-Process -ArgumentList $q3e_args -FilePath .\quake3e.x64.exe -PassThru
 
