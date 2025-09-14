@@ -51,11 +51,31 @@ function Exit-TranscodeSession { # exits if the demo's stopAfterCurrent is set t
     }
 }
 
+function Get-ChildProcess ($parentID, $name) { # please be aware that this function will not return if process does not spawn child eventually
+    
+    $filter = "parentprocessid = '$parentID' AND name = '$name'"
+    
+    do {
+        $cimInst = Get-CIMInstance -ClassName win32_process -filter $filter
+    } while($null -eq $cimInst)
+
+    Get-Process -PID $cimInst.ProcessId
+}
+
 ## PROGRAM START ##
 
 # check if a list was already created
 if (-not (Test-Path -PathType Leaf -Path '.\zz_transcode\demoList.json')){
     Write-Output 'ERROR: No demo list found!' 'Please create one using ".\prepare.ps1".' ' '
+    pause
+    exit 1
+}
+
+$config = Read-Json .\zz_config\transcode.json
+
+# check if process priority is valid
+if (-not ('High','Normal','Idle').Contains($config.ffmpegPriority)){
+    Write-Output "ERROR: Process priority ""$($config.ffmpegPriority)"" is not valid!" 'Please adjust config file accordingly.' ' '
     pause
     exit 1
 }
@@ -68,9 +88,6 @@ Show-DemoList $($demoList | Where-Object -Property 'transcoded' -eq $false) -Exc
 if (-not (Get-UserConfirmation 'Do you want to continue?')){
     exit 0
 }
-
-
-$config = Read-Json .\zz_config\transcode.json
 
 # check if the q3 config files have already been modified
 if ($config.configSwapping.enabled) {
@@ -114,11 +131,21 @@ if ($config.configSwapping.enabled) {
         "+video-pipe $tempName"
     )
     
-    Start-Process -Wait -ArgumentList $q3e_args -FilePath .\quake3e.x64.exe
-    
-    Remove-Item ".\$fs_game\demos\$tempName.dm_68"
+    $q3e_proc = Start-Process -ArgumentList $q3e_args -FilePath .\quake3e.x64.exe -PassThru
+
+    $ffproc = Get-ChildProcess $q3e_proc.Id 'cmd.exe' # this selects the cmd child process invoked by q3e
+    $ffproc = Get-ChildProcess $ffproc.Id 'ffmpeg.exe' # this selects the actual ffmpeg process
+
+    # set priority
+    $q3e_proc.PriorityClass = $config.ffmpegPriority
+    $ffproc.PriorityClass = $config.ffmpegPriority
+
+    Wait-Process -PID $ffproc.Id
     Remove-Item ".\$fs_game\videos\$tempName.mp4-log.txt"
     Move-Item ".\$fs_game\videos\$tempName.mp4" ".\zz_transcode\output\$cleanName.mp4"
+    
+    Wait-Process -PID $q3e_proc.Id -ErrorAction SilentlyContinue
+    Remove-Item ".\$fs_game\demos\$tempName.dm_68"
 
     $demo.transcoded = $true
 

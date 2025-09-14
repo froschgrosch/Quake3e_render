@@ -12,5 +12,6 @@
     "exitBehaviour": {
         "value": 0,
         "shutdownTimeout": 60
-    }
+    },
+    "ffmpegPriority":"Idle"
 }
