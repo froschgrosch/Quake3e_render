@@ -126,7 +126,7 @@ if ($config.configSwapping.enabled) {
         $currentConfigFiles | ConvertTo-Json | Out-File -Force .\zz_transcode\currentConfigFiles.json
     }
     
-    Copy-Item -Force -Path ".\zz_transcode\input\$cleanName.dm_68" -Destination ".\$fs_game\demos\$tempName.dm_68"
+    $inputFile = Copy-Item -Force -PassThru -Path ".\zz_transcode\input\$cleanName.dm_68" -Destination ".\$fs_game\demos\$tempName.dm_68"
 
     $q3e_args = @(
         "+set fs_game $fs_game",
@@ -151,10 +151,11 @@ if ($config.configSwapping.enabled) {
 
     Wait-Process -PID $ffproc.Id
     Remove-Item ".\$fs_game\videos\$tempName.mp4-log.txt"
-    Move-Item ".\$fs_game\videos\$tempName.mp4" ".\zz_transcode\output\$cleanName.mp4"
+    $outputFile = Move-Item -PassThru ".\$fs_game\videos\$tempName.mp4" ".\zz_transcode\output\$cleanName.mp4"
+    $outputFile.LastWriteTime = $inputFile.LastWriteTime
     
     Wait-Process -PID $q3e_proc.Id -ErrorAction SilentlyContinue
-    Remove-Item ".\$fs_game\demos\$tempName.dm_68"
+    Remove-Item $inputFile
 
     $demo.transcoded = $true
 
