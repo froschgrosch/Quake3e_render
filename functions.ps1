@@ -1,4 +1,8 @@
-### Functions ###
+###################################################################
+# Quake3e_Render - https://github.com/froschgrosch/Quake3e_render #
+# Licensed under GNU GPLv3. - File: functions.ps1                 #
+###################################################################
+
 function Get-UserConfirmation($prompt){ # Do a yes/no query and return $true/$false 
     do { 
         $msgboxResult = Read-Host "$prompt (y/n)"
@@ -6,6 +10,7 @@ function Get-UserConfirmation($prompt){ # Do a yes/no query and return $true/$fa
 
     return $msgboxResult -eq 'y'
 }
+
 function Read-Json ($inputPath) {
     return Get-Content $inputPath | ConvertFrom-Json
 }

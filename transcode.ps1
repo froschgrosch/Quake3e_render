@@ -1,3 +1,8 @@
+###################################################################
+# Quake3e_Render - https://github.com/froschgrosch/Quake3e_render #
+# Licensed under GNU GPLv3. - File: transcode.ps1                 #
+###################################################################
+
 ## FUNCTION DECLARATION ##
 . .\functions.ps1
 

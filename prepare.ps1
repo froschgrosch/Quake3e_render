@@ -1,4 +1,11 @@
+###################################################################
+# Quake3e_Render - https://github.com/froschgrosch/Quake3e_render #
+# Licensed under GNU GPLv3. - File: prepare.ps1                   #
+###################################################################
+
 . .\functions.ps1
+## PROGRAM START ##
+
 $config = Read-Json .\zz_config\prepare.json
 
 # check if a list was already created
