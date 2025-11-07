@@ -57,8 +57,7 @@ function Exit-TranscodeSession { # exits if the demo's stopAfterCurrent is set t
     }
 }
 
-function Get-ChildProcess ($parentID, $name) { # please be aware that this function will not return if process does not spawn child eventually
-    
+function Get-ChildProcess ($parentID, $name) { # this function will never return if process does not spawn child eventually
     $filter = "parentprocessid = '$parentID' AND name = '$name'"
     
     do {
