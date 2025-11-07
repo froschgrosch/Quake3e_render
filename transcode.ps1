@@ -119,18 +119,14 @@ if (-not (Get-UserConfirmation 'Do you want to continue?')){
 # check if the q3 config files have already been modified
 if ($config.configSwapping.enabled) {
     if (Test-Path -PathType Leaf -Path '.\zz_transcode\currentConfigFiles.json') { # use existing status file
+        $Script:currentConfigFiles = Read-Json '.\zz_transcode\currentConfigFiles.json'
+        
         # check if the loaded status matches with the present files
-        $configFilesValid = $true
         :checkingloop foreach($game in $config.configSwapping.allowedGames) {
-            if (($currentConfigFiles.$game -ne (-1)) -ne (Test-Path -PathType Leaf -Path ".\$gamename\q3config.cfg.bak")){
-                $configFilesValid = $false
+            if (($currentConfigFiles.$game -ne (-1)) -ne (Test-Path -PathType Leaf -Path ".\$game\q3config.cfg.bak")){
                 New-ConfigFileStatus
                 break :checkingloop
             }
-        }
-
-        if ($configFilesValid) {
-            $currentConfigFiles = Read-Json '.\zz_transcode\currentConfigFiles.json'
         }
     }
     else {
