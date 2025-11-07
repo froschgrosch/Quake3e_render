@@ -6,6 +6,28 @@
 ## FUNCTION DECLARATION ##
 . .\functions.ps1
 
+function New-ConfigFileStatus {
+    Clear-ConfigFiles
+
+    $Script:currentConfigFiles = New-Object -TypeName PSCustomObject
+    foreach($game in $config.configSwapping.allowedGames) {
+        Add-ToObject -inputObject $currentConfigFiles -name $game -value (-1)
+    }
+    $currentConfigFiles | ConvertTo-Json | Out-File -Force .\zz_transcode\currentConfigFiles.json
+}
+
+function Clear-ConfigFiles {
+    foreach($game in $config.configSwapping.allowedGames) {
+        if (Test-Path -PathType Leaf -Path ".\$game\q3config.cfg.bak"){
+            Remove-Item -Path ".\$game\q3config.cfg"
+            Rename-Item -Path ".\$game\q3config.cfg.bak" -NewName 'q3config.cfg'
+        }   
+    }
+    if (Test-Path -PathType Leaf -Path .\zz_transcode\currentConfigFiles.json){ 
+        Remove-Item .\zz_transcode\currentConfigFiles.json
+    }
+}
+
 function Set-ConfigFile ($i, $gamename) {
     # index of -1 is the q3config.cfg that is already installed beforehand
 
@@ -96,14 +118,23 @@ if (-not (Get-UserConfirmation 'Do you want to continue?')){
 
 # check if the q3 config files have already been modified
 if ($config.configSwapping.enabled) {
-    if (Test-Path -PathType Leaf -Path '.\zz_transcode\currentConfigFiles.json') { # use existing file
-        $currentConfigFiles = Read-Json '.\zz_transcode\currentConfigFiles.json'
-    }
-    else { # create new one
-        $currentConfigFiles = New-Object -TypeName PSCustomObject
-        foreach ($game in $config.configSwapping.allowedGames) {
-            Add-ToObject -inputObject $currentConfigFiles -name $game -value (-1)
+    if (Test-Path -PathType Leaf -Path '.\zz_transcode\currentConfigFiles.json') { # use existing status file
+        # check if the loaded status matches with the present files
+        $configFilesValid = $true
+        :checkingloop foreach($game in $config.configSwapping.allowedGames) {
+            if (($currentConfigFiles.$game -ne (-1)) -ne (Test-Path -PathType Leaf -Path ".\$gamename\q3config.cfg.bak")){
+                $configFilesValid = $false
+                New-ConfigFileStatus
+                break :checkingloop
+            }
         }
+
+        if ($configFilesValid) {
+            $currentConfigFiles = Read-Json '.\zz_transcode\currentConfigFiles.json'
+        }
+    }
+    else {
+        New-ConfigFileStatus
     }
 }
 
@@ -167,14 +198,8 @@ if ($config.configSwapping.enabled) {
 }
 
 # clean up swapped config files
-# todo - possible improvement: only clean up files that were actually changed
-
 if ($config.configSwapping.enabled) {
-    foreach($game in $config.configSwapping.allowedGames) {
-        #Write-Output "cleanup $game"
-        Set-ConfigFile (-1) $game
-    }
-    Remove-Item .\zz_transcode\currentConfigFiles.json
+    Clear-ConfigFiles
 }
 
 Remove-Item .\zz_transcode\demoList.json
