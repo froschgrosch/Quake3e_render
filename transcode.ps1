@@ -31,6 +31,7 @@ function Set-ConfigFile ($i, $gamename) {
 
         $currentConfigFiles.$gamename = $i
     }
+    $currentConfigFiles | ConvertTo-Json | Out-File -Force .\zz_transcode\currentConfigFiles.json
 }
 
 function Exit-TranscodeSession { # exits if the demo's stopAfterCurrent is set to true or at the end of the render list.
@@ -104,7 +105,6 @@ if ($config.configSwapping.enabled) {
         foreach ($game in $config.configSwapping.allowedGames) {
             Add-ToObject -inputObject $currentConfigFiles -name $game -value (-1)
         }
-        $currentConfigFiles | ConvertTo-Json | Out-File -Force .\zz_transcode\currentConfigFiles.json
     }
 }
 
@@ -123,7 +123,6 @@ if ($config.configSwapping.enabled) {
     # swap config if applicable
     if ($config.configSwapping.enabled){
         Set-ConfigFile $demo.renderConfig $fs_game
-        $currentConfigFiles | ConvertTo-Json | Out-File -Force .\zz_transcode\currentConfigFiles.json
     }
     
     $inputFile = Copy-Item -Force -PassThru -Path ".\zz_transcode\input\$cleanName.dm_68" -Destination ".\$fs_game\demos\$tempName.dm_68"
