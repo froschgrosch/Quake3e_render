@@ -6,6 +6,28 @@
 ## FUNCTION DECLARATION ##
 . .\functions.ps1
 
+function New-ConfigFileStatus {
+    Clear-ConfigFiles
+
+    $Script:currentConfigFiles = New-Object -TypeName PSCustomObject
+    foreach($game in $config.configSwapping.allowedGames) {
+        Add-ToObject -inputObject $currentConfigFiles -name $game -value (-1)
+    }
+    $currentConfigFiles | ConvertTo-Json | Out-File -Force .\zz_transcode\currentConfigFiles.json
+}
+
+function Clear-ConfigFiles {
+    foreach($game in $config.configSwapping.allowedGames) {
+        if (Test-Path -PathType Leaf -Path ".\$game\q3config.cfg.bak"){
+            Remove-Item -Path ".\$game\q3config.cfg"
+            Rename-Item -Path ".\$game\q3config.cfg.bak" -NewName 'q3config.cfg'
+        }   
+    }
+    if (Test-Path -PathType Leaf -Path .\zz_transcode\currentConfigFiles.json){ 
+        Remove-Item .\zz_transcode\currentConfigFiles.json
+    }
+}
+
 function Set-ConfigFile ($i, $gamename) {
     # index of -1 is the q3config.cfg that is already installed beforehand
 
@@ -31,6 +53,7 @@ function Set-ConfigFile ($i, $gamename) {
 
         $currentConfigFiles.$gamename = $i
     }
+    $currentConfigFiles | ConvertTo-Json | Out-File -Force .\zz_transcode\currentConfigFiles.json
 }
 
 function Exit-TranscodeSession { # exits if the demo's stopAfterCurrent is set to true or at the end of the render list.
@@ -56,8 +79,7 @@ function Exit-TranscodeSession { # exits if the demo's stopAfterCurrent is set t
     }
 }
 
-function Get-ChildProcess ($parentID, $name) { # please be aware that this function will not return if process does not spawn child eventually
-    
+function Get-ChildProcess ($parentID, $name) { # this function will never return if process does not spawn child eventually
     $filter = "parentprocessid = '$parentID' AND name = '$name'"
     
     do {
@@ -96,15 +118,19 @@ if (-not (Get-UserConfirmation 'Do you want to continue?')){
 
 # check if the q3 config files have already been modified
 if ($config.configSwapping.enabled) {
-    if (Test-Path -PathType Leaf -Path '.\zz_transcode\currentConfigFiles.json') { # use existing file
-        $currentConfigFiles = Read-Json '.\zz_transcode\currentConfigFiles.json'
-    }
-    else { # create new one
-        $currentConfigFiles = New-Object -TypeName PSCustomObject
-        foreach ($game in $config.configSwapping.allowedGames) {
-            Add-ToObject -inputObject $currentConfigFiles -name $game -value (-1)
+    if (Test-Path -PathType Leaf -Path '.\zz_transcode\currentConfigFiles.json') { # use existing status file
+        $Script:currentConfigFiles = Read-Json '.\zz_transcode\currentConfigFiles.json'
+        
+        # check if the loaded status matches with the present files
+        :checkingloop foreach($game in $config.configSwapping.allowedGames) {
+            if (($currentConfigFiles.$game -ne (-1)) -ne (Test-Path -PathType Leaf -Path ".\$game\q3config.cfg.bak")){
+                New-ConfigFileStatus
+                break :checkingloop
+            }
         }
-        $currentConfigFiles | ConvertTo-Json | Out-File -Force .\zz_transcode\currentConfigFiles.json
+    }
+    else {
+        New-ConfigFileStatus
     }
 }
 
@@ -123,7 +149,6 @@ if ($config.configSwapping.enabled) {
     # swap config if applicable
     if ($config.configSwapping.enabled){
         Set-ConfigFile $demo.renderConfig $fs_game
-        $currentConfigFiles | ConvertTo-Json | Out-File -Force .\zz_transcode\currentConfigFiles.json
     }
     
     $inputFile = Copy-Item -Force -PassThru -Path ".\zz_transcode\input\$cleanName.dm_68" -Destination ".\$fs_game\demos\$tempName.dm_68"
@@ -169,14 +194,8 @@ if ($config.configSwapping.enabled) {
 }
 
 # clean up swapped config files
-# todo - possible improvement: only clean up files that were actually changed
-
 if ($config.configSwapping.enabled) {
-    foreach($game in $config.configSwapping.allowedGames) {
-        #Write-Output "cleanup $game"
-        Set-ConfigFile (-1) $game
-    }
-    Remove-Item .\zz_transcode\currentConfigFiles.json
+    Clear-ConfigFiles
 }
 
 Remove-Item .\zz_transcode\demoList.json
