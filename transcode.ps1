@@ -80,7 +80,7 @@ function Exit-TranscodeSession { # exits if the demo's stopAfterCurrent is set t
 }
 
 function Get-ChildProcess ($parentID, $name) { # this function will never return if process does not spawn child eventually
-    $filter = "parentprocessid = '$parentID' AND name = '$name'"
+    $filter = "parentprocessid = '$parentID' AND name = '$name.exe'"
     
     do {
         $cimInst = Get-CIMInstance -ClassName win32_process -filter $filter
@@ -167,8 +167,8 @@ if ($config.configSwapping.enabled) {
     
     $q3e_proc = Start-Process -ArgumentList $q3e_args -FilePath .\quake3e.x64.exe -PassThru
 
-    $ffproc = Get-ChildProcess $q3e_proc.Id 'cmd.exe' # this selects the cmd child process invoked by q3e
-    $ffproc = Get-ChildProcess $ffproc.Id 'ffmpeg.exe' # this selects the actual ffmpeg process
+    $ffproc = Get-ChildProcess $q3e_proc.Id 'cmd' # this selects the cmd child process invoked by q3e
+    $ffproc = Get-ChildProcess $ffproc.Id 'ffmpeg' # this selects the actual ffmpeg process
 
     # set priority
     $q3e_proc.PriorityClass = $config.ffmpegPriority
@@ -182,9 +182,10 @@ if ($config.configSwapping.enabled) {
     Wait-Process -PID $q3e_proc.Id -ErrorAction SilentlyContinue
     Remove-Item $inputFile
 
+    # mark demo as finished
     $demo.transcoded = $true
 
-    # mark demo as finished
+    # save current state
     $demoList | ConvertTo-Json | Out-File .\zz_transcode\demoList.json
 
     if ($demo.stopAfterCurrent){
