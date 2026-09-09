@@ -43,7 +43,9 @@ if ($null -eq $inputFiles) {
         if (Get-UserConfirmation 'This demo was already transcoded at some point. Would you like to transcode it again?'){
             Remove-Item $outputPathName
         }
-        continue :demoLoop
+        else {
+            continue :demoLoop
+        }
     }
 
     # check if fs_game is valid
