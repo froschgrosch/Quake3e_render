@@ -8,12 +8,15 @@
 
 # check if a list was already created
 ls ./zz_transcode/input/*.json 1> /dev/null 2>&1
-if [ $? -eq 0 ]; then
-    echo 'Another demo list was already created earlier.'
-    echo 'If you want to create a new one, delete the file and run this script again.'
-    exit 1
-
-    # todo: add prompt to delete and recreate / abort
+if [ $? -eq 0 ]
+then
+    read -p 'Another demo list was already created earlier. Do you want to create a new one? [Y/n] ' -n 1
+    if [[ $REPLY =~ ^[Nn]$ ]]; then
+        echo; echo 'Exiting.'
+        exit 1
+    fi
+    echo; echo 'Creating new demo list.'
+    rm ./zz_transcode/input/*.json
 fi
 
 # check if input folder is empty
@@ -42,11 +45,17 @@ for file in ./zz_transcode/input/*.dm_68; do
     echo "Checking $file..."
 
     # check if video already exists
-    if [ -f "./zz_transcode/output/$file.mp4" ]
+    if [ -f "./zz_transcode/output_video/$file.mp4" ]
     then
-        echo 'This demo was already transcoded at some point. Would you like to transcode it again?'
-        # todo: add y/n question
-        continue
+        read -p 'This demo was already transcoded at some point. Would you like to transcode it again? [Y/n] ' -n 1
+        if [[ $REPLY =~ ^[Nn]$ ]];
+        then
+            echo
+            continue
+        else
+            echo
+            rm "./zz_transcode/output_video/$file.mp4"
+        fi
     fi
 
     # check if fs_game is valid
@@ -67,7 +76,7 @@ for file in ./zz_transcode/input/*.dm_68; do
     # this starts another jq instance every loop, can this be avoided?
     renderConfig=$(jq -c --arg game "$fs_game" '.games.defaultConfig[$game]' ./zz_config/prepare.json)
 
-    # write file blabla
+    # write demo data file
     jq -n \
     --arg fs_game "$fs_game" \
     --arg renderConfig "$renderConfig" \
