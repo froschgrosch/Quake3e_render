@@ -18,8 +18,12 @@ function exit_transcodesession() {
         ;;
 
         2) # shutdown with timeout
-            echo 'Shutdown with timeout (to be implemented)'
-            exit 0
+            timeout=$(jq -r '.exitBehaviour.shutdownTimeout' ./zz_config/transcode.json)
+
+            echo "Shutting down in $timeout seconds."
+            read -t $timeout -n 1 -s -r -p 'Press any key to shut down immediately (Ctrl + C to cancel)...'
+
+            systemctl poweroff
         ;;
 
         *)
@@ -71,13 +75,12 @@ do
 
     if [[ $(jq .stopAfterThis "$demo") == true ]] then
         echo 'Demo transcoding is being paused.'; echo 'You can resume by invoking "./transcode.sh" again.'
-        mv $demo ./zz_transcode/output_demo/
+        rm $demo
         exit_transcodesession
     fi
 
-    # can be deleted alternatively
-    mv $demo ./zz_transcode/output_demo/
-
+    # delete data file
+    rm $demo
 done
 
 echo "Demo transcoding is finished."
