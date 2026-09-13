@@ -53,13 +53,11 @@ for file in ./zz_transcode/input/*.dm_68; do
     # check if video already exists
     if [ -f "./zz_transcode/output_video/$file.mp4" ]
     then
-        read -p 'This demo was already transcoded at some point. Would you like to transcode it again? [Y/n] ' -n 1
+        read -p 'This demo was already transcoded at some point. Would you like to transcode it again? [Y/n] ' -n 1; echo
         if [[ $REPLY =~ ^[Nn]$ ]];
         then
-            echo
             continue
         else
-            echo
             rm "./zz_transcode/output_video/$file.mp4"
         fi
     fi
