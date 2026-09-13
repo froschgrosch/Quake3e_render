@@ -36,8 +36,14 @@ then
     exit 1
 fi
 
-demoList=()
+# read default config to associative array
+declare -A defaultConfig
 
+while IFS=$'\t' read -r key value; do
+    defaultConfig["$key"]="$value"
+done < <(jq -r '.games.defaultConfig | to_entries[] | "\(.key)\t\(.value)"' ./zz_config/prepare.json)
+
+# main preparation loop
 for file in ./zz_transcode/input/*.dm_68; do
     file=$(basename -a $file)
     file=${file/.dm_68/}
@@ -73,19 +79,15 @@ for file in ./zz_transcode/input/*.dm_68; do
 
     echo 'Adding to renderlist.'
 
-    # this starts another jq instance every loop, can this be avoided?
-    renderConfig=$(jq -c --arg game "$fs_game" '.games.defaultConfig[$game]' ./zz_config/prepare.json)
-
     # write demo data file
     jq -n \
     --arg fs_game "$fs_game" \
-    --arg renderConfig "$renderConfig" \
+    --arg renderConfig "${defaultConfig[$fs_game]}" \
     '{
         stopAfterThis: false,
         renderConfig: $renderConfig,
         fs_game: $fs_game
     }' > "./zz_transcode/input/$file.json"
-
 done
 
 echo 'Demo preprocessing is finished.'
