@@ -53,6 +53,11 @@ function Set-ConfigFile ($i, $gamename) {
 
         $currentConfigFiles.$gamename = $i
     }
+    else {
+        Write-Output 'Invalid conditions for config swapping. Nothing was changed.'
+        Write-Output "Requested for fs_game: $gamename" "Requested config index: $i" "Current Index: $($currentConfigFiles.$gamename)"
+        return
+    }
     $currentConfigFiles | ConvertTo-Json | Out-File -Force .\zz_transcode\currentConfigFiles.json
 }
 
