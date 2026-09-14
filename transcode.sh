@@ -123,6 +123,12 @@ then
     fi
 fi
 
+# get process priority
+
+# this jq expression clamps the output between 0 and 19 when the input is an integer (non-root users can only increase the process niceness (reduce priority))
+# if any other data type is inputted, the output defaults to 0 (default priority)
+ffmpegPriority=$(jq '.ffmpegPriority | if (type == "number" and . == (. | floor)) then (if . < 0 then 0 elif . > 19 then 19 else . end) else 0 end' ./zz_config/transcode.json)
+
 ## PROGRAM START ##
 
 # todo: improve readability for user
@@ -158,12 +164,13 @@ do
 
     cp "./zz_transcode/input/$name.dm_68" "./$fs_game/demos/temp_transcode.dm_68"
 
-    ./quake3e.x64 +set fs_game "$fs_game" +set fs_homepath "$PWD" +set nextdemo 'quit' +set in_nograb 1 +demo 'temp_transcode.dm_68' +video-pipe 'temp_transcode' &> /dev/null
+    # start quake3e with desired priority - the child processes will inherit it
+    nice -n $ffmpegPriority ./quake3e.x64 +set ttycon 0 +set fs_game "$fs_game" +set fs_homepath "$PWD" +set nextdemo 'quit' +set in_nograb 1 +demo 'temp_transcode.dm_68' +video-pipe 'temp_transcode' &>/dev/null
 
     rm "./$fs_game/demos/temp_transcode.dm_68"
 
     rm "./$fs_game/videos/temp_transcode.mp4-log.txt"
-    mv "./$fs_game/videos/temp_transcode.mp4" "./zz_transcode/output_video/$name.mp4"
+    mv -f "./$fs_game/videos/temp_transcode.mp4" "./zz_transcode/output_video/$name.mp4"
 
     # set date on video file
     touch -d "$(date -Rr "./zz_transcode/input/$name.dm_68")" "./zz_transcode/output_video/$name.mp4"
@@ -171,7 +178,8 @@ do
     # move demo file to output_folder
     mv "./zz_transcode/input/$name.dm_68" ./zz_transcode/output_demo/
 
-    if [[ $(jq .stopAfterThis "$demo") == true ]] then
+    if [[ $(jq .stopAfterThis "$demo") == true ]]
+    then
         echo 'Demo transcoding is being paused.'; echo 'You can resume by invoking "./transcode.sh" again.'
         rm $demo
         exit_transcodesession

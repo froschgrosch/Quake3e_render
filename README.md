@@ -93,9 +93,9 @@ The following settings can be configured in `transcode.json` (list is not yet co
 | 1     | Exit without pausing                                                                                                               |
 | 2     | Shut down the machine after the timeout specified in `exitBehaviour.shutdownTimeout`. The shutdown can be interrupted by the user. |
 
-### `ffmpegPriority` (Windows-only)
+### `ffmpegPriority`
 
-Defines the process priority that the ffmpeg and Quake3e processes will use. Allowed values are `Idle` (low), `Normal` and `High`.
+Defines the process priority that the ffmpeg and Quake3e processes will use. Allowed values for Windows are `Idle` (low), `Normal` and `High`. Under Linux you may set a niceness value between `0` (default priority) and `19` (lowest priority).
 
 ### `hideQ3window` (Windows-only) 
 
