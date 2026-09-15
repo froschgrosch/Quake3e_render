@@ -44,7 +44,7 @@ if ($null -eq $inputFiles) {
             Remove-Item $outputPathName
         }
         else {
-            continue :demoLoop
+            continue :preparationLoop
         }
     }
 
@@ -53,7 +53,7 @@ if ($null -eq $inputFiles) {
     $fs_game = $udtoutput.configStringValues.fs_game
     if (-not $config.games.allowed.Contains($fs_game)) {
         Write-Output """$fs_game"" is not a valid game!" ' '
-        continue :demoLoop
+        continue :preparationLoop
     }
 
     # demo is valid, ready for further processing
