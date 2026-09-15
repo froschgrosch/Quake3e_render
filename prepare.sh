@@ -64,11 +64,31 @@ for file in ./zz_transcode/input/*.dm_68; do
         fi
     fi
 
-    # check if fs_game is valid
+    # get demo data
     udtoutput=$(zz_tools/UDT_json -a=g -c "./zz_transcode/input/$file.dm_68")
+    if [[ $? -ne 0 ]]
+    then
+        echo 'Return code of UDT_json is not 0! Demo will be moved to output folder without transcoding.'; echo
 
-    #echo $udtoutput | jq
+        mv "./zz_transcode/input/$file.dm_68" ./zz_transcode/output_demo/
+        continue
+    fi
 
+    # unfortunately, UDT_json does not exit with error code 1 when the demo is invalid.
+    # this statement checks if there is exactly one gamestate, and if there are players and configstrings in the demo
+    if [[ $(echo $udtoutput | jq '(.gameStates[].players | length == 0) or (.gameStates | length != 1) or (.gameStates[].configStringValues | length == 0)') == true ]]
+    then
+        echo 'Something is wrong with this demo file (Not exactly one gamestate, or no players or configStrings).'
+        echo; echo "UDT_json output of $file:"
+
+        echo "$udtoutput" | jq .
+        echo 'Moving to output folder.'; echo
+
+        mv "./zz_transcode/input/$file.dm_68" ./zz_transcode/output_demo/
+        continue
+    fi
+
+    # check if fs_game is valid
     fs_game=$(echo "$udtoutput" | jq -r .gameStates[0].configStringValues.gamename)
 
     if [[ ! " ${allowedGames[*]} " =~ [[:space:]]${fs_game}[[:space:]] ]]
