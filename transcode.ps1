@@ -162,7 +162,7 @@ if ($config.configSwapping.enabled) {
         "+set fs_game $fs_game",
         '+set nextdemo quit',
         '+set in_nograb 1',
-        "+demo $tempName"
+        "+demo $tempName",
         "+video-pipe $tempName"
     )
 
