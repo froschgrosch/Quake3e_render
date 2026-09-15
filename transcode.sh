@@ -88,6 +88,18 @@ function exit_transcodesession() {
 
 ## INITIALIZATION ##
 
+# todo: improve readability for user
+ls -1 ./zz_transcode/input/*.json 2> /dev/null
+if [ $? -eq 0 ]
+then
+    echo 'The preceding list of demos will be transcoded.'
+    read -n 1 -s -r -p 'Press any key to continue (Ctrl + C to cancel)...'
+    echo # for newline
+else
+    echo 'ERROR: No prepared demos found! Please prepare some using prepare.sh!'
+    exit 1
+fi
+
 # check if config swapping is enabled
 configSwapping=$(jq '.configSwapping.enabled' ./zz_config/transcode.json)
 
@@ -129,21 +141,8 @@ fi
 # if any other data type is inputted, the output defaults to 0 (default priority)
 ffmpegPriority=$(jq '.ffmpegPriority | if (type == "number" and . == (. | floor)) then (if . < 0 then 0 elif . > 19 then 19 else . end) else 0 end' ./zz_config/transcode.json)
 
+
 ## PROGRAM START ##
-
-# todo: improve readability for user
-
-ls -1 ./zz_transcode/input/*.json 2> /dev/null
-if [ $? -eq 0 ]
-then
-    echo 'The preceding list of demos will be transcoded.'
-    read -n 1 -s -r -p 'Press any key to continue (Ctrl + C to cancel)...'
-    echo # for newline
-else
-    echo 'ERROR: No prepared demos found! Please prepare some using prepare.sh!'
-    exit 1
-fi
-
 
 # main loop
 for demo in ./zz_transcode/input/*.json
