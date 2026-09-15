@@ -50,7 +50,7 @@ function init_configfiles() {
 }
 
 function clear_configfiles() {
-    rm ./zz_transcode/cfg_*
+    rm -f ./zz_transcode/cfg_* 2>/dev/null
     for fs_game in "${cfg_allowedGames[@]}"
     do
         if [ -f "./$fs_game/q3config.cfg.bak" ]; then
@@ -181,17 +181,17 @@ do
     if [[ $(jq .stopAfterThis "$demo") == true ]]
     then
         echo 'Demo transcoding is being paused.'; echo 'You can resume by invoking "./transcode.sh" again.'
-        rm $demo
+        rm "$demo"
         exit_transcodesession
     fi
 
     # delete data file
-    rm $demo
+    rm "$demo"
 done
 
 if [[ $configSwapping == true ]]
 then
-    clear_configfile
+    clear_configfiles
 fi
 
 echo "Demo transcoding is finished."
