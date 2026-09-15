@@ -7,10 +7,11 @@
 ## PROGRAM START ##
 
 # check if a list was already created
-ls ./zz_transcode/input/*.json 1> /dev/null 2>&1
+ls ./zz_transcode/input/*.json 2> /dev/null
 if [ $? -eq 0 ]
 then
-    read -p 'Another demo list was already created earlier. Do you want to create a new one? [Y/n] ' -n 1
+    echo 'The preceding list of demos were already prepared for transcoding earlier.'
+    read -p 'Do you want to discard the list and create a new one? [Y/n] ' -n 1
     if [[ $REPLY =~ ^[Nn]$ ]]; then
         echo; echo 'Exiting.'
         exit 1
@@ -53,12 +54,13 @@ for file in ./zz_transcode/input/*.dm_68; do
     # check if video already exists
     if [ -f "./zz_transcode/output_video/$file.mp4" ]
     then
-        read -p 'This demo was already transcoded at some point. Would you like to transcode it again? [Y/n] ' -n 1; echo
-        if [[ $REPLY =~ ^[Nn]$ ]];
+        read -p 'This demo was already transcoded at some point. Would you like to transcode it again? [y/N] ' -n 1; echo
+        if [[ $REPLY =~ ^[Yy]$ ]];
         then
-            continue
-        else
             rm "./zz_transcode/output_video/$file.mp4"
+        else
+            mv "./zz_transcode/input/$file" ./zz_transcode/output_demo/
+            continue
         fi
     fi
 
