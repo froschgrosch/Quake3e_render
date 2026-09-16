@@ -84,14 +84,30 @@ function Exit-TranscodeSession { # exits if the demo's stopAfterCurrent is set t
     }
 }
 
-function Get-ChildProcess ($parentID, $name) { # this function will never return if process does not spawn child eventually
-    $filter = "parentprocessid = '$parentID' AND name = '$name.exe'"
-    
+# this function displays an error message and exits if no child is found before timeout
+# with 40 attempts at .25 seconds, this function should time out after about 10 seconds
+function Get-ChildProcess ($parentID, $name) {
+    $filter = "parentprocessid = $parentID AND name = '$name.exe'"
+    $maxAttempts = 40
+    $attempts = 0
+
     do {
         $cimInst = Get-CIMInstance -ClassName win32_process -filter $filter
-    } while($null -eq $cimInst)
 
-    Get-Process -PID $cimInst.ProcessId
+        if ($null -eq $cimInst) {
+            $attempts++
+            Start-Sleep -Milliseconds 250
+        }
+        else {
+            # select the first process if multiple children exist, should not happen under normal circumstances
+            $cimInst = $cimInst | Select-Object -First 1
+            return $(Get-Process -PID $cimInst.ProcessId)
+        }
+    } while ($attempts -le $maxAttempts)
+
+    Write-Output 'Error: Could not retrieve child process!' "Parent PID: $parentID" "Requested child name: $name.exe" ' '
+    pause
+    exit 1
 }
 
 ## PROGRAM START ##
