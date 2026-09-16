@@ -13,7 +13,7 @@ The transcoding script will exit after the desired demo and resume where it left
 
 ## Installation
 
-### Downloads
+### Dependencies
 
 - **ffmpeg**
     - Windows:
@@ -27,6 +27,9 @@ The transcoding script will exit after the desired demo and resume where it left
   - Required files:
     - UDT_json.exe (Windows)
     - UDT_json (Linux)
+- **jq** (only required on Linux)
+  - [Project homepage (jqlang.org)](https://jqlang.org/)
+  - `sudo apt install jq`
 
 ### File / folder structure
 
