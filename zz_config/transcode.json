@@ -10,9 +10,9 @@
         ]
     },
     "exitBehaviour": {
-        "value": 0,
+        "value": 1,
         "shutdownTimeout": 60
     },
-    "ffmpegPriority": "Idle",
+    "ffmpegPriority": 19,
     "hideQ3window": true
 }

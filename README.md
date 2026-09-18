@@ -3,12 +3,11 @@
 This repository contains a set of scripts to aid in converting Quake 3 demos to video files.
 The Powershell implementation was rewritten because the old codebase was a huge mess, the Bash variant for Linux was written from scratch.
 
-To use this program please put your demos into the input folder.
-After that, the preparation script should be invoked to prepare for demo transcoding.
+To use this program please put your demos into the input folder. After that, the preparation script should be invoked to prepare for demo transcoding. 
 
-The transcoding script will look at the output of the preparation script and transcode the demo files one at a time.
+The transcoding script will look at the output of the preparation script and transcode the demo files one at a time. The video files can be found in the *output*/*output_video* folders after transcoding. The transcoding script allows for a custom q3config file to be used for each demo respectively, this feature is documented later in this readme file.
 
-You can manipulate the prepared files beforehand, it is for instance possible to pause the demo transcoding process.
+You can manipulate the prepared files before transcoding, it is for instance possible to pause the demo transcoding process.
 The transcoding script will exit after the desired demo and resume where it left off when it is invoked again.
 
 ## Installation
@@ -44,7 +43,7 @@ Your Q3 folder
 |   |
 |   |---input/
 |   |---output/
-|   |---currentConfigFiles.json // only if feature is enabled
+|   |---currentConfigFiles.json (only if the config swapping feature is enabled)
 |   |---demoList.json
 |
 |---zz_transcode/ (Linux)
@@ -84,9 +83,22 @@ Your Q3 folder
 |---quake3e.x64.exe (Windows)
 |---quake3e.x64 (Linux)
 ```
+## `prepare.ps1 / prepare.sh`
+
+The preparation script looks at all demo files in the input folder and prepares the valid demos for transcoding. It will generate a singular demo list under windows. Under Linux, the script will prepare an individual json file for each demo.
+
+The information files can be manipulated before starting the transcoding process by manually editing `demoList.json` (on Windows), or from the individual `demo.json` files (on Linux) respectively. It is possible to pause the transcoding process after a certain demo by setting `stopAfterThis`/`stopAfterCurrent` to `true`. You may set a individual config file index for each demo (explained later in this readme).
+
+### Settings
+
+`games.allowed` contains all valid games that will be accepted for transcoding. If a demos has a game that is not allowed, the preparation script will display a warning and proceed with processing the remaining demos.
+
+`games.defaultConfig` contains the default config index that will be selected for each game. It is possible to manually modify this value before transcoding by editing `demoList.json` (on Windows), or the individual `demo.json` files (on Linux) respectively.
+
+
 ## `transcode.ps1` / `transcode.sh`
 
-The following settings can be configured in `transcode.json` (list is not yet complete).
+The following settings can be configured in `transcode.json`:
 
 ### `exitBehaviour.value`
 
@@ -103,3 +115,43 @@ Defines the process priority that the ffmpeg and Quake3e processes will use. All
 ### `hideQ3window` (Windows-only) 
 
 When set to `true`, the Quake3e window will be minimized. The cmd window which houses the ffmpeg process will still show up for now.
+
+### Quake 3 configuration file swapping
+
+It is possible to configure a q3config.cfg to be used for each demo in a transcoding session. The script will dynamically copy in the correct config file per demo, and will revert to the inital state after transcoding is finished. This feature can be enabled/disabled altogether with the `configSwapping.enabled` setting. Only demos with a game value contained in `configSwapping.allowedGames` will be affected by this feature.
+
+The q3config files that are meant to be swapped in need to be stored in a certain manner:
+
+*Example config file structure:*
+```
+|---zz_config/
+|   |---q3cfg/
+|       |
+|       |---arena/
+|       |   |
+|       |   |---00_preview.cfg
+|       |   |---01_ra3newbs2.cfg
+|       |   |---02_ra3newbs3.cfg
+|       |
+|       |---osp/
+|           |
+|           |---00_q3msk_4K.cfg
+```
+
+The files available for config swapping are configured in `transcode.json`.
+
+*Example config list:*
+```JSON
+"list": [
+    ["00_preview","arena"],
+    ["01_ra3newbs2","arena"],
+    ["02_ra3newbs3","arena"],
+    ["00_q3msk_4K","osp"]
+]
+```
+
+The first value of the inner array defines the filename, the second value selects the game. The files are selected via the index of the outer array. 
+
+For instance, if you wanted to select the config file "01_ra3newbs2.cfg", you would use the index of `1`. The index of `-1` selects the q3config.cfg file that was already installed in the mod folder beforehand. The transcoding script checks if the game of the demo matches the game of the config file, and will display an error message if the values do not match.
+
+The actual index for each demo will be read from `demoList.json` (on Windows), or from the individual `demo.json` files (on Linux) respectively.
