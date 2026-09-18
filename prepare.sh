@@ -4,6 +4,20 @@
 # Licensed under GNU GPLv3. - File: prepare.sh                    #
 ###################################################################
 
+## INITIALIZATION ##
+
+# check if all external dependencies are available
+jq --version 1> /dev/null 2>&1
+if [ $? -ne 0 ]; then
+    echo 'Error: jq is not available! Please refer to README.md'
+    exit 1
+fi
+
+if [ ! -x ./zz_tools/UDT_json ]; then
+    echo 'Error: UDT_json is not available at the expected path! Please refer to README.md'
+    exit 1
+fi
+
 ## PROGRAM START ##
 
 # check if a list was already created

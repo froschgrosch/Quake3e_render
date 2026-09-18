@@ -88,6 +88,25 @@ function exit_transcodesession() {
 
 ## INITIALIZATION ##
 
+# check if all external dependencies are available
+jq --version 1> /dev/null 2>&1
+if [ $? -ne 0 ]; then
+    echo 'Error: jq is not available! Please refer to README.md'
+    exit 1
+fi
+
+if [ ! -x ./zz_tools/UDT_json ]; then
+    echo 'Error: UDT_json is not available at the expected path! Please refer to README.md'
+    exit 1
+fi
+
+# check if q3 binary is present and executable
+if [ ! -x ./quake3e.x64 ]; then
+    echo 'Error: The Quake 3 binary is not present and executable at required path!'; echo 'Please place quake3e.x64 in the current directory.'
+    exit 1
+fi
+
+# list input files
 # todo: improve readability for user
 ls -1 ./zz_transcode/input/*.json 2> /dev/null
 if [ $? -eq 0 ]
