@@ -96,8 +96,7 @@ if [ $? -ne 0 ]; then
 fi
 
 if [ ! -x ./zz_tools/UDT_json ]; then
-    echo 'Error: UDT_json is not available at the expected path! Please refer to README.md'
-    exit 1
+    echo 'Warning: UDT_json is not available at the expected path! prepare.sh will not work.'
 fi
 
 # check if q3 binary is present and executable
