@@ -118,24 +118,24 @@ When set to `true`, the Quake3e window will be minimized. The cmd window which h
 
 ### Quake 3 configuration file swapping
 
-It is possible to configure a q3config.cfg to be used for each demo in a transcoding session. The script will dynamically copy in the correct config file per demo, and will revert to the inital state after transcoding is finished. This feature can be enabled/disabled altogether with the `configSwapping.enabled` setting. Only demos with a game value contained in `configSwapping.allowedGames` will be affected by this feature.
+It is possible to configure a individual q3config file to be used for each demo in a transcoding session. The script will dynamically copy in the correct config file per demo, and will revert to the inital state after transcoding is finished. This feature can be enabled/disabled altogether with the `configSwapping.enabled` setting. Only demos with a game value contained in `configSwapping.allowedGames` will be affected by this feature.
 
 The *q3config.cfg* files that are meant to be swapped in need to be stored in a certain manner:
 
 *Example config file structure:*
 ```
 |---zz_config/
-|   |---q3cfg/
-|       |
-|       |---arena/
-|       |   |
-|       |   |---00_preview.cfg
-|       |   |---01_ra3newbs2.cfg
-|       |   |---02_ra3newbs3.cfg
-|       |
-|       |---osp/
-|           |
-|           |---00_q3msk_4K.cfg
+    |---q3cfg/
+        |
+        |---arena/
+        |   |
+        |   |---00_preview.cfg
+        |   |---01_ra3newbs2.cfg
+        |   |---02_ra3newbs3.cfg
+        |
+        |---osp/
+            |
+            |---00_q3msk_4K.cfg
 ```
 
 The files available for config swapping are configured in `transcode.json`.
